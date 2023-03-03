@@ -117,9 +117,11 @@ $TRIGGER_SWITCH_SC = {
 }
 #endregion [ DEFAULT SWITCH ]
 
-$ScriptRoot = $PSScriptRoot
-$FunctionsPath = Join-Path -Path $ScriptRoot -ChildPath 'functions.ps1' -Verbose
+$ScriptRoot     = $PSScriptRoot
+$FunctionsPath  = Join-Path -Path $ScriptRoot -ChildPath 'functions.ps1' -Verbose
+$ProceduresPath = Join-Path -Path $ScriptRoot -ChildPath 'procedures.ps1' -Verbose
 Import-Module $FunctionsPath
+Import-Module $ProceduresPath
 $MeasureCommand = Measure-Command -Expression {
     $TRIGGER_SWITCH_SC | iex -ErrorAction SilentlyContinue
 }
