@@ -1,0 +1,24 @@
+[{
+  "Id": 8629072,
+  "NodeId": "MDEyOk9yZ2FuaXphdGlvbjg2MjkwNzI=",
+  "Login": "nginxinc",
+  "Name": "NGINX, Inc.",
+  "RepositoryList":[
+    {
+      "Id": 53553027,
+      "NodeId": "MDEwOlJlcG9zaXRvcnk1MzU1MzAyNw==",
+      "Name": "kubernetes-ingress",
+      "FullName": "nginxinc/kubernetes-ingress",
+      "Install":[{
+        "Condition": "allowed",
+        "Method": "Kubernetes",
+        "Type":"implementation",
+        "Command": "Uknown"
+      }],
+      "Branch": "main",
+      "Private": false,
+      "Token": false,
+      "Update": "fetch"
+    }
+  ]
+}]

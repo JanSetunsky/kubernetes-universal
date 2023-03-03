@@ -1,0 +1,14 @@
+[
+  {
+    "Id": "fbdcd989-b37d-47c8-ad90-c6d2808be1c8",
+    "Name": "Az.Aks",
+    "FullName": "Azure managed Kubernetes cmdlets",
+    "InstallMethod": "Runspace",
+    "InstallType": "Decode-Command",
+    "InstallCommand": "Install-Module -Name Az.Aks",
+    "VerificationMethod": "Get-Module",
+    "RepositoryIdentity": "Official",
+    "RepositoryType": "Cloud",
+    "RepositoryPath": null
+  }
+]

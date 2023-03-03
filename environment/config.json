@@ -1,0 +1,336 @@
+{
+  "Autor": "Jan Setunský",
+  "ProjectId": "0c6dde14-1cff-431e-879c-f32bcf0e3e78",
+  "ProjectName": "project_name",
+  "ProjectType": "Stable",
+  "ProjectVersion": "1.0.0.0",
+  "InstallPath": "",
+  "ProjectsPath": "",
+  "RunspacePath": "",
+  "OS": "Windows",
+  "Platform": "Win32NT",
+  "Architecture": "AMD64",
+  "EnviromentProvider": "Localhost",
+  "EnviromentType": "On-premises",
+  "Virtualization": "None",
+  "PowerShellVersion": 7,
+  "InstallingGitHub": "True",
+  "InstallingGitLab": "True",  
+  "InstallingModules": "True",
+  "InstallingPackages": "True",
+  "ListOfProcedures": [
+    {
+      "Startup": [
+        {
+          "Name": "Start-MiniKube_Server",
+          "MD": false,
+          "Extra": false,
+          "Data":[]
+        }
+      ],
+      "Delete": [
+        {
+          "Name": "Delete-MiniKube_NGINX_DEMO",
+          "MD": false,
+          "Extra": true,
+          "Data":[{
+            "DeploymentName": "nginx-demo"
+          }]
+        }
+      ],
+      "Deploy": [
+        {
+          "Name": "Deploy-MiniKube_NGINX_DEMO",
+          "MD": false,
+          "Extra": true,
+          "Data":[{
+            "DeploymentName": "nginx-demo",
+            "DeploymentImage": "docker.io/nginx:1.23",
+            "DeploymentType": "NodePort",
+            "DeploymentPort": "80"
+          }]
+        },
+        {
+          "Name": "Get-Services_MiniKube_NGINX_DEMO",
+          "MD": false,
+          "Extra": false,
+          "Data":[]
+        }
+      ],
+      "Helm_Install_Prometheus_Grafana": [
+        {
+          "Name": "Helm-Install_Prometheus",
+          "MD": false,
+          "Extra": false,
+          "Data":[]
+        },
+        {
+          "Name": "Helm-Install_Grafana",
+          "MD": false,
+          "Extra": false,
+          "Data":[]
+        },
+        {
+          "Name": "Helm-Deploy_Prometheus_And_Grafana",
+          "MD": false,
+          "Extra": true,
+          "Data":[{
+            "KubernetesDashboard": "https://raw.githubusercontent.com/kubernetes/kops/master/addons/kubernetes-dashboard/v1.8.3.yaml",
+            "MonitoringStandalone": "https://raw.githubusercontent.com/kubernetes/kops/master/addons/monitoring-standalone/v1.8.3.yaml"
+            }]
+        }
+      ],
+      "any_procedure_name": [],
+      "Stop": [
+        {
+          "Name": "Stop-MiniKube_Server",
+          "MD": false,
+          "Extra": false,
+          "Data":[]
+        }
+      ]
+    }
+  ],
+  "ListOfGitHub": [
+    {
+      "Id": 8629072,
+      "NodeId": "MDEyOk9yZ2FuaXphdGlvbjg2MjkwNzI=",
+      "Login": "nginxinc",
+      "Status": "Uknown",
+      "RepositoryList": [
+        {
+          "Id": 53553027,
+          "NodeId": "MDEwOlJlcG9zaXRvcnk1MzU1MzAyNw==",
+          "Name": "kubernetes-ingress",
+          "FullName": "nginxinc/kubernetes-ingress",
+          "Status": "Uknown",
+          "Ownership": false,
+          "Install":[{
+            "Condition": "Uknown",
+            "Method": "Uknown",
+            "Type":"Uknown",
+            "Command": "Uknown"
+          }],          
+          "Branch": "Uknown",
+          "Private": false,
+          "Token": false,
+          "Update": "Uknown"
+        }
+      ]
+    }
+  ],
+  "ListOfGitLab": [],
+  "ListOfModules": [
+    {
+      "Id": "fbdcd989-b37d-47c8-ad90-c6d2808be1c8",
+      "Name": "Az.Aks",
+      "Status": "Uknown"
+    }
+  ],
+  "ListOfPackages": [
+    {
+      "Id": "d92ed38a-d5d1-4d65-aeaf-8bbd04650c4a",
+      "Name": "Chocolatey",
+      "Status": "Uknown",
+      "ToolList": [
+        {
+          "Id": "d9d0c273-9d40-439f-923d-cbd5ce2879d3",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "choco.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "a805d1d4-f8db-488c-bdcc-e0576152ca98",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "chocolatey.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        }
+      ]
+    },
+    {
+      "Id": "befb5ab2-3858-4fa3-8d77-6315d755ef45",
+      "Name": "Git",
+      "Status": "Uknown",
+      "ToolList": [
+        {
+          "Id": "ad1029da-315e-43c3-90cb-bac6863e9c69",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "git-gui.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "2cdb9612-3a5e-4013-b1a8-ba36c529b8b7",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "git-lfs.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "db8ad7fe-6871-4a4f-9dde-5df5014f05d6",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "git.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "d34fbcd3-b428-43ec-9164-00c9209eb71a",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "gitk.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        }        
+      ]
+    },    
+    {
+      "Id": "3ce8da8c-0907-4c72-93c4-6f1ccf5f5ab3",
+      "Name": "Docker-Desktop",
+      "Status": "Uknown",
+      "ToolList": [
+        {
+          "Id": "f71a6c1e-0994-4252-b0ed-4fe33b96db8e",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "docker-compose-v1.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "1ab0053a-4d03-4a06-b285-a16568a6a08b",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "docker-compose.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "aba19f6a-36a0-4552-a964-4e6873330b99",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "docker-credential-desktop.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "9c4a576a-90c3-44aa-b0df-4df7046c65a3",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "docker-credential-ecr-login.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "078148c3-34e5-4ac7-a00c-ba1774eb1795",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "docker-credential-wincred.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "31a09c4d-4e53-4451-88e8-ffe72b70db41",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "docker-index.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "ef4bf270-9573-461a-883a-9c1779db1437",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "docker.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        }
+      ]
+    },
+    {
+      "Id": "aac84daf-bbef-4a71-b7b9-d2d33a987f28",
+      "Name": "Kubernetes-CLI",
+      "Status": "Uknown",
+      "ToolList": [
+        {
+          "Id": "685d26f0-eb64-470a-a94a-814d457786eb",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "kubectl-convert.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "5aa271e6-46bc-4957-bd2a-5642a7823e20",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "kubectl.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        },
+        {
+          "Id": "5aa271e6-46bc-4957-bd2a-5642a7823e20",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "kubectl.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        }
+      ]
+    },
+    {
+      "Id": "124ba87d-a080-437e-8b5a-ec8a143f9088",
+      "Name": "Kubernetes-Helm",
+      "Status": "Uknown",
+      "ToolList": [
+        {
+          "Id": "365781c1-67d9-4cf7-99ce-a35c0a9319ea",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "helm.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        }
+      ]
+    },
+    {
+      "Id": "bacbd60c-e897-4f36-ada8-2cbce4d632e0",
+      "Name": "MiniKube",
+      "Status": "Uknown",
+      "ToolList": [
+        {
+          "Id": "e53dc1be-a6d4-486a-be8d-a500d6d91d88",
+          "CommandMethod": "Get-Command",
+          "CommandType": "Application",
+          "Name": "minikube.exe",
+          "Version": "Uknown",
+          "Source": "Uknown",
+          "Status": "Uknown"
+        }
+      ]
+    }
+  ]
+}

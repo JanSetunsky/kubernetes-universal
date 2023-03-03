@@ -1,0 +1,491 @@
+{
+  "Autor": "Jan Setunský",
+  "ProjectId": "0c6dde14-1cff-431e-879c-f32bcf0e3e78",
+  "ProjectName": "project_name",
+  "ProjectType": "Stable",
+  "ProjectVersion": "1.0.0.0",
+  "InstallPath": "D:\\NOTINO_TASK\\environment",
+  "RunspacePath": "D:\\NOTINO_TASK\\runspace",
+  "ProjectsPath": "D:\\NOTINO_TASK\\runspace\\projects",
+  "OS": "Windows",
+  "Platform": "Win32NT",
+  "Architecture": "AMD64",
+  "EnviromentProvider": "Localhost",
+  "EnviromentType": "On-premises",
+  "Virtualization": "None",
+  "InstallingGitHub": "True",
+  "InstallingGitLab": "True",
+  "InstallingModules": "True",
+  "InstallingPackages": "True",
+  "ListOfProcedures": [
+    {
+      "Startup": [
+        {
+          "Name": "Start-MiniKube_Server",
+          "MD": false,
+          "Extra": false,
+          "Data": []
+        }
+      ],
+      "Delete": [
+        {
+          "Name": "Delete-MiniKube_NGINX_DEMO",
+          "MD": false,
+          "Extra": true,
+          "Data": [
+            {
+              "DeploymentName": "nginx-demo"
+            }
+          ]
+        }
+      ],
+      "Deploy": [
+        {
+          "Name": "Deploy-MiniKube_NGINX_DEMO",
+          "MD": false,
+          "Extra": true,
+          "Data": [
+            {
+              "DeploymentName": "nginx-demo",
+              "DeploymentImage": "docker.io/nginx:1.23",
+              "DeploymentType": "NodePort",
+              "DeploymentPort": "80"
+            }
+          ]
+        },
+        {
+          "Name": "Get-Services_MiniKube_NGINX_DEMO",
+          "MD": false,
+          "Extra": false,
+          "Data": []
+        }
+      ],
+      "Helm_Install_Prometheus_Grafana": [
+        {
+          "Name": "Helm-Install_Prometheus",
+          "MD": false,
+          "Extra": false,
+          "Data": []
+        },
+        {
+          "Name": "Helm-Install_Grafana",
+          "MD": false,
+          "Extra": false,
+          "Data": []
+        },
+        {
+          "Name": "Helm-Deploy_Prometheus_And_Grafana",
+          "MD": false,
+          "Extra": true,
+          "Data": [
+            {
+              "KubernetesDashboard": "https://raw.githubusercontent.com/kubernetes/kops/master/addons/kubernetes-dashboard/v1.8.3.yaml",
+              "MonitoringStandalone": "https://raw.githubusercontent.com/kubernetes/kops/master/addons/monitoring-standalone/v1.8.3.yaml"
+            }
+          ]
+        }
+      ],
+      "any_procedure_name": [],
+      "Stop": [
+        {
+          "Name": "Stop-MiniKube_Server",
+          "MD": false,
+          "Extra": false,
+          "Data": []
+        }
+      ]
+    }
+  ],
+  "ListOfGitHub": [
+    {
+      "Id": 8629072,
+      "NodeId": "MDEyOk9yZ2FuaXphdGlvbjg2MjkwNzI=",
+      "Login": "nginxinc",
+      "Status": "is-downloaded",
+      "RepositoryList": [
+        {
+          "Id": 53553027,
+          "NodeId": "MDEwOlJlcG9zaXRvcnk1MzU1MzAyNw==",
+          "Name": "kubernetes-ingress",
+          "FullName": "nginxinc/kubernetes-ingress",
+          "Install": [
+            {
+              "Condition": "allowed",
+              "Method": "Kubernetes",
+              "Type": "implementation",
+              "Command": "Uknown"
+            }
+          ],
+          "Branch": "main",
+          "Private": false,
+          "Token": false,
+          "Update": "fetch",
+          "Status": "is-downloaded",
+          "Path": "D:\\NOTINO_TASK\\runspace\\projects\\project_name\\github\\nginxinc\\kubernetes-ingress"
+        }
+      ],
+      "Path": "D:\\NOTINO_TASK\\runspace\\projects\\project_name\\github\\nginxinc"
+    }
+  ],
+  "ListOfGitLab": [],
+  "ListOfModules": [
+    {
+      "Name": "Az.Aks",
+      "Status": "is-installed",
+      "Installer": "Runspace",
+      "Command": "Install-Module -Name Az.Aks",
+      "Type": "Decode-Command",
+      "Path": null
+    }
+  ],
+  "ListOfPackages": [
+    {
+      "Name": "Chocolatey",
+      "Status": "is-installed",
+      "Installer": "Runspace",
+      "Command": "UwBlAHQALQBFAHgAZQBjAHUAdABpAG8AbgBQAG8AbABpAGMAeQAgAEIAeQBwAGEAcwBzACAALQBTAGMAbwBwAGUAIABQAHIAbwBjAGUAcwBzACAALQBGAG8AcgBjAGUAOwBpAGUAeAAgACgAKABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAcwA6AC8ALwBjAGgAbwBjAG8AbABhAHQAZQB5AC4AbwByAGcALwBpAG4AcwB0AGEAbABsAC4AcABzADEAJwApACkA",
+      "Type": "Encode-Command",
+      "Path": null,
+      "ToolList": [
+        {
+          "Id": "d9d0c273-9d40-439f-923d-cbd5ce2879d3",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "choco.exe",
+          "Version": {
+            "Major": 0,
+            "Minor": 12,
+            "Build": 1,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\ProgramData\\chocolatey\\bin\\choco.exe",
+          "Status": "is-installed"
+        },
+        {
+          "Id": "a805d1d4-f8db-488c-bdcc-e0576152ca98",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "chocolatey.exe",
+          "Version": {
+            "Major": 0,
+            "Minor": 12,
+            "Build": 1,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\ProgramData\\chocolatey\\bin\\chocolatey.exe",
+          "Status": "is-installed"
+        }
+      ]
+    },
+    {
+      "Name": "Git",
+      "Status": "is-installed",
+      "Installer": "Chocolatey",
+      "Command": "choco install git --force",
+      "Type": "Decode-Command",
+      "Path": null,
+      "ToolList": [
+        {
+          "Id": "ad1029da-315e-43c3-90cb-bac6863e9c69",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "git-gui.exe",
+          "Version": {
+            "Major": 2,
+            "Minor": 32,
+            "Build": 0,
+            "Revision": 2,
+            "MajorRevision": 0,
+            "MinorRevision": 2
+          },
+          "Source": "C:\\Program Files\\Git\\cmd\\git-gui.exe",
+          "Status": "is-installed"
+        },
+        {
+          "Id": "2cdb9612-3a5e-4013-b1a8-ba36c529b8b7",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "git-lfs.exe",
+          "Version": {
+            "Major": 2,
+            "Minor": 32,
+            "Build": 0,
+            "Revision": 2,
+            "MajorRevision": 0,
+            "MinorRevision": 2
+          },
+          "Source": "C:\\Program Files\\Git\\cmd\\git-lfs.exe",
+          "Status": "is-installed"
+        },
+        {
+          "Id": "db8ad7fe-6871-4a4f-9dde-5df5014f05d6",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "git.exe",
+          "Version": {
+            "Major": 2,
+            "Minor": 32,
+            "Build": 0,
+            "Revision": 2,
+            "MajorRevision": 0,
+            "MinorRevision": 2
+          },
+          "Source": "C:\\Program Files\\Git\\cmd\\git.exe",
+          "Status": "is-installed"
+        },
+        {
+          "Id": "d34fbcd3-b428-43ec-9164-00c9209eb71a",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "gitk.exe",
+          "Version": {
+            "Major": 2,
+            "Minor": 32,
+            "Build": 0,
+            "Revision": 2,
+            "MajorRevision": 0,
+            "MinorRevision": 2
+          },
+          "Source": "C:\\Program Files\\Git\\cmd\\gitk.exe",
+          "Status": "is-installed"
+        }
+      ]
+    },
+    {
+      "Name": "Docker-Desktop",
+      "Status": "is-installed",
+      "Installer": "Chocolatey",
+      "Command": "choco install docker-desktop --force",
+      "Type": "Decode-Command",
+      "Path": null,
+      "ToolList": [
+        {
+          "Id": "f71a6c1e-0994-4252-b0ed-4fe33b96db8e",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "docker-compose-v1.exe",
+          "Version": {
+            "Major": 0,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker-compose-v1.exe",
+          "Status": "is-installed"
+        },
+        {
+          "Id": "1ab0053a-4d03-4a06-b285-a16568a6a08b",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "docker-compose.exe",
+          "Version": {
+            "Major": 0,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker-compose.exe",
+          "Status": "is-installed"
+        },
+        {
+          "Id": "aba19f6a-36a0-4552-a964-4e6873330b99",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "docker-credential-desktop.exe",
+          "Version": {
+            "Major": 0,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker-credential-desktop.exe",
+          "Status": "is-installed"
+        },
+        {
+          "Id": "9c4a576a-90c3-44aa-b0df-4df7046c65a3",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "docker-credential-ecr-login.exe",
+          "Version": {
+            "Major": 0,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker-credential-ecr-login.exe",
+          "Status": "is-installed"
+        },
+        {
+          "Id": "078148c3-34e5-4ac7-a00c-ba1774eb1795",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "docker-credential-wincred.exe",
+          "Version": {
+            "Major": 0,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker-credential-wincred.exe",
+          "Status": "is-installed"
+        },
+        {
+          "Id": "31a09c4d-4e53-4451-88e8-ffe72b70db41",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "docker-index.exe",
+          "Version": {
+            "Major": 0,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker-index.exe",
+          "Status": "is-installed"
+        },
+        {
+          "Id": "ef4bf270-9573-461a-883a-9c1779db1437",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "docker.exe",
+          "Version": {
+            "Major": 0,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\docker.exe",
+          "Status": "is-installed"
+        }
+      ]
+    },
+    {
+      "Name": "Kubernetes-CLI",
+      "Status": "is-duplicated",
+      "Installer": "Chocolatey",
+      "Command": "choco install kubernetes-cli --force",
+      "Type": "Decode-Command",
+      "Path": null,
+      "ToolList": [
+        {
+          "Id": "685d26f0-eb64-470a-a94a-814d457786eb",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "kubectl-convert.exe",
+          "Version": {
+            "Major": 1,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\ProgramData\\chocolatey\\bin\\kubectl-convert.exe",
+          "Status": "is-installed"
+        },
+        {
+          "Id": "5aa271e6-46bc-4957-bd2a-5642a7823e20",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "kubectl.exe",
+          "Version": {
+            "Major": 0,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\Program Files\\Docker\\Docker\\resources\\bin\\kubectl.exe",
+          "Status": "is-duplicated"
+        },
+        {
+          "Id": "5aa271e6-46bc-4957-bd2a-5642a7823e20",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "kubectl.exe",
+          "Version": {
+            "Major": 1,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\ProgramData\\chocolatey\\bin\\kubectl.exe",
+          "Status": "is-duplicated"
+        }
+      ]
+    },
+    {
+      "Name": "Kubernetes-Helm",
+      "Status": "is-installed",
+      "Installer": "Chocolatey",
+      "Command": "choco install kubernetes-helm --force",
+      "Type": "Decode-Command",
+      "Path": null,
+      "ToolList": [
+        {
+          "Id": "365781c1-67d9-4cf7-99ce-a35c0a9319ea",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "helm.exe",
+          "Version": {
+            "Major": 1,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\ProgramData\\chocolatey\\bin\\helm.exe",
+          "Status": "is-installed"
+        }
+      ]
+    },
+    {
+      "Name": "MiniKube",
+      "Status": "is-installed",
+      "Installer": "Chocolatey",
+      "Command": "choco install minikube --force",
+      "Type": "Decode-Command",
+      "Path": null,
+      "ToolList": [
+        {
+          "Id": "e53dc1be-a6d4-486a-be8d-a500d6d91d88",
+          "CommandMethod": "Get-Command",
+          "CommandType": 32,
+          "Name": "minikube.exe",
+          "Version": {
+            "Major": 1,
+            "Minor": 0,
+            "Build": 0,
+            "Revision": 0,
+            "MajorRevision": 0,
+            "MinorRevision": 0
+          },
+          "Source": "C:\\ProgramData\\chocolatey\\bin\\minikube.exe",
+          "Status": "is-installed"
+        }
+      ]
+    }
+  ]
+}

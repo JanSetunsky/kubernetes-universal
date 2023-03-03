@@ -1,0 +1,417 @@
+[{
+  "Id":"d92ed38a-d5d1-4d65-aeaf-8bbd04650c4a",
+  "Name":"Chocolatey",
+  "FullName":"Chocolatey",
+  "Version":"Latest",
+  "Platform":"Windows",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Runspace",
+  "InstallType":"Encode-Command",
+  "InstallCommand":"UwBlAHQALQBFAHgAZQBjAHUAdABpAG8AbgBQAG8AbABpAGMAeQAgAEIAeQBwAGEAcwBzACAALQBTAGMAbwBwAGUAIABQAHIAbwBjAGUAcwBzACAALQBGAG8AcgBjAGUAOwBpAGUAeAAgACgAKABOAGUAdwAtAE8AYgBqAGUAYwB0ACAAUwB5AHMAdABlAG0ALgBOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkALgBEAG8AdwBuAGwAbwBhAGQAUwB0AHIAaQBuAGcAKAAnAGgAdAB0AHAAcwA6AC8ALwBjAGgAbwBjAG8AbABhAHQAZQB5AC4AbwByAGcALwBpAG4AcwB0AGEAbABsAC4AcABzADEAJwApACkA",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[
+    {
+    "Id":"d9d0c273-9d40-439f-923d-cbd5ce2879d3",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"choco.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    },
+    {
+    "Id":"a805d1d4-f8db-488c-bdcc-e0576152ca98",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"chocolatey.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    }
+  ]
+},
+{
+  "Id":"8c9fb26b-cbcb-44de-bdf3-57bb81a62480",
+  "Name":"WinGet",
+  "FullName":"Windows package manager",
+  "Version":"Latest",
+  "Platform":"Windows",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"None",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"None",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[
+    {
+    "Id":"794cc4af-b58c-4af0-ba60-924b0aca06e7",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"winget.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    }
+  ]
+},
+{
+  "Id":"befb5ab2-3858-4fa3-8d77-6315d755ef45",
+  "Name":"Git",
+  "FullName":"Git",
+  "Version":"Latest",
+  "Platform":"Windows",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install git --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[
+    {
+    "Id":"ad1029da-315e-43c3-90cb-bac6863e9c69",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"git-gui.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    },
+    {
+      "Id":"2cdb9612-3a5e-4013-b1a8-ba36c529b8b7",
+      "CommandMethod":"Get-Command",
+      "CommandType":"Application",
+      "Name":"git-lfs.exe",
+      "Version":"Uknown",
+      "Source":"Uknown"
+    },
+    {
+      "Id":"db8ad7fe-6871-4a4f-9dde-5df5014f05d6",
+      "CommandMethod":"Get-Command",
+      "CommandType":"Application",
+      "Name":"git.exe",
+      "Version":"Uknown",
+      "Source":"Uknown"
+    },
+    {
+      "Id":"d34fbcd3-b428-43ec-9164-00c9209eb71a",
+      "CommandMethod":"Get-Command",
+      "CommandType":"Application",
+      "Name":"gitk.exe",
+      "Version":"Uknown",
+      "Source":"Uknown"
+    }
+  ]
+},
+{
+  "Id":"3ce8da8c-0907-4c72-93c4-6f1ccf5f5ab3",
+  "Name":"Docker-Desktop",
+  "FullName":"Docker Desktop",
+  "Version":"Latest",
+  "Platform":"Windows",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install docker-desktop --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[
+    {
+    "Id":"f71a6c1e-0994-4252-b0ed-4fe33b96db8e",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"docker-compose-v1.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    },
+    {
+    "Id":"1ab0053a-4d03-4a06-b285-a16568a6a08b",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"docker-compose.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    },
+    {
+    "Id":"aba19f6a-36a0-4552-a964-4e6873330b99",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"docker-credential-desktop.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    },
+    {
+    "Id":"9c4a576a-90c3-44aa-b0df-4df7046c65a3",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"docker-credential-ecr-login.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    },
+    {
+    "Id":"078148c3-34e5-4ac7-a00c-ba1774eb1795",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"docker-credential-wincred.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    },
+    {
+    "Id":"31a09c4d-4e53-4451-88e8-ffe72b70db41",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"docker-index.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    },
+    {
+    "Id":"ef4bf270-9573-461a-883a-9c1779db1437",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"docker.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    }
+  ]
+},
+{
+  "Id":"7884f687-e7ae-4890-825b-2cb637a8512a",
+  "Name":"Kubernetes-CLI",
+  "FullName":"Kubernetes Command Line Interface",
+  "Version":"Latest",
+  "Platform":"Linux",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install kubernetes-cli --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[]
+},
+{
+  "Id":"ca06d5f5-9cde-497d-aa1e-d3dd6f4a1390",
+  "Name":"Kubernetes-CLI",
+  "FullName":"Kubernetes Command Line Interface",
+  "Version":"Latest",
+  "Platform":"MacOS",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install kubernetes-cli --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[]
+},
+{
+  "Id":"aac84daf-bbef-4a71-b7b9-d2d33a987f28",
+  "Name":"Kubernetes-CLI",
+  "FullName":"Kubernetes Command Line Interface",
+  "Version":"Latest",
+  "Platform":"Windows",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install kubernetes-cli --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[
+    {
+    "Id":"685d26f0-eb64-470a-a94a-814d457786eb",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"kubectl-convert.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    },
+    {
+    "Id":"5aa271e6-46bc-4957-bd2a-5642a7823e20",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"kubectl.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    }
+  ]
+},
+{
+  "Id":"124ba87d-a080-437e-8b5a-ec8a143f9088",
+  "Name":"Kubernetes-Helm",
+  "FullName":"Kubernetes Helm",
+  "Version":"Latest",
+  "Platform":"Windows",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install kubernetes-helm --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[
+    {
+    "Id":"365781c1-67d9-4cf7-99ce-a35c0a9319ea",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"helm.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    }
+  ]
+},
+{
+  "Id":"74494fe1-7fc2-4e4a-a571-ca1bbbed8c3c",
+  "Name":"Kubernetes-Kubeadm",
+  "FullName":"Kubernetes Kubeadm",
+  "Version":"Latest",
+  "Platform":"Windows",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install kubernetes-kubeadm --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[
+    {
+    "Id":"3a864ed6-0001-45ed-9d96-4820116fc391",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"kubeadm.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    }
+  ]
+},
+{
+  "Id":"1adc17e9-c6f6-48e9-a067-08fcb6ff9aba",
+  "Name":"MiniKube",
+  "FullName":"Mini Kubernetes",
+  "Version":"Latest",
+  "Platform":"Linux",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install minikube --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[]
+},
+{
+  "Id":"d1bad106-e3b9-454d-8ca5-0d17e57e1462",
+  "Name":"MiniKube",
+  "FullName":"Mini Kubernetes",
+  "Version":"Latest",
+  "Platform":"MacOS",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install minikube --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[]
+},
+{
+  "Id":"bacbd60c-e897-4f36-ada8-2cbce4d632e0",
+  "Name":"MiniKube",
+  "FullName":"Mini Kubernetes",
+  "Version":"Latest",
+  "Platform":"Windows",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install minikube --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[
+    {
+    "Id":"e53dc1be-a6d4-486a-be8d-a500d6d91d88",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"minikube.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    }
+  ]
+},
+{
+  "Id":"cbe33870-21a4-43b2-9d3f-a9118ebf7045",
+  "Name":"Grafana",
+  "FullName":"Grafana",
+  "Version":"Latest",
+  "Platform":"Linux",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install grafana --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[]
+},
+{
+  "Id":"5d96da95-4b71-4642-973c-95080184348b",
+  "Name":"Grafana",
+  "FullName":"Grafana",
+  "Version":"Latest",
+  "Platform":"MacOS",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install grafana --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[]
+},
+{
+  "Id":"95796a3d-582f-412d-8172-b878ba8f8bc7",
+  "Name":"Grafana",
+  "FullName":"Grafana",
+  "Version":"Latest",
+  "Platform":"Windows",
+  "Architecture":"x86-64",
+  "ReleaseType":"Stable",
+  "InstallMethod":"Chocolatey",
+  "InstallType":"Decode-Command",
+  "InstallCommand":"choco install grafana --force",
+  "RepositoryIdentity":"Official",
+  "RepositoryType":"Cloud",
+  "RepositoryPath":null,
+  "ToolList":[
+    {
+    "Id":"66e0a140-425a-4632-8ac2-e8a8006001ff",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"grafana-cli.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    },
+    {
+    "Id":"7126c160-5950-4d5e-86d9-ec10072a0f24",
+    "CommandMethod":"Get-Command",
+    "CommandType":"Application",
+    "Name":"grafana-server.exe",
+    "Version":"Uknown",
+    "Source":"Uknown"
+    }
+  ]
+}]
