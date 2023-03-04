@@ -21,8 +21,8 @@ $DefaultRoot      = Split-Path $ScriptRoot -Parent
 $InterfacesPath   = Join-Path -Path $DefaultRoot -ChildPath 'interfaces' -Verbose
 $CorePath         = Join-Path -Path $InterfacesPath -ChildPath 'core.ps1' -Verbose
 $ProceduresPath   = Join-Path -Path $InterfacesPath -ChildPath 'procedures.ps1' -Verbose
-$DefinitionPath   = Join-Path -Path $InterfacesPath -ChildPath 'project_install_definition.ps1' -Verbose
-$VerificationPath = Join-Path -Path $InterfacesPath -ChildPath 'project_install_verification.ps1' -Verbose
+$DefinitionPath   = Join-Path -Path $InterfacesPath -ChildPath 'installation_definition.ps1' -Verbose
+$VerificationPath = Join-Path -Path $InterfacesPath -ChildPath 'installation_verification.ps1' -Verbose
 Import-Module $CorePath
 Import-Module $ProceduresPath
 Import-Module $DefinitionPath

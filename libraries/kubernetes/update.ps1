@@ -19,9 +19,9 @@ $LibrariesRoot    = Split-Path $ScriptRoot -Parent
 $DefaultRoot      = Split-Path $LibrariesRoot -Parent
 $InterfacesPath   = Join-Path -Path $DefaultRoot -ChildPath 'interfaces' -Verbose
 $CorePath         = Join-Path -Path $InterfacesPath -ChildPath 'core.ps1' -Verbose
-$ProceduresPath   = Join-Path -Path $InterfacesPath -ChildPath 'procedures.ps1' -Verbose
-$DefinitionPath   = Join-Path -Path $InterfacesPath -ChildPath 'project_kubernetes_definition.ps1' -Verbose
-$VerificationPath = Join-Path -Path $InterfacesPath -ChildPath 'project_build_verification.ps1' -Verbose
+$ProceduresPath   = Join-Path -Path $InterfacesPath -ChildPath 'kubernetes_procedures.ps1' -Verbose
+$DefinitionPath   = Join-Path -Path $InterfacesPath -ChildPath 'kubernetes_definition.ps1' -Verbose
+$VerificationPath = Join-Path -Path $InterfacesPath -ChildPath 'kubernetes_verification.ps1' -Verbose
 Import-Module $CorePath
 Import-Module $ProceduresPath
 Import-Module $DefinitionPath
