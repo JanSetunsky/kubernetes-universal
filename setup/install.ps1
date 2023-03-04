@@ -17,9 +17,8 @@ $TRIGGER_SWITCH_SC = {
 #endregion [ DEFAULT SWITCH ]
 
 $ScriptRoot       = $PSScriptRoot
-$LibrariesRoot    = Split-Path $ScriptRoot -Parent
-$DefaultRoot      = Split-Path $LibrariesRoot -Parent
-$InterfacesPath   = Join-Path -Path $LibrariesRoot -ChildPath 'interfaces' -Verbose
+$DefaultRoot      = Split-Path $ScriptRoot -Parent
+$InterfacesPath   = Join-Path -Path $DefaultRoot -ChildPath 'interfaces' -Verbose
 $CorePath         = Join-Path -Path $InterfacesPath -ChildPath 'core.ps1' -Verbose
 $ProceduresPath   = Join-Path -Path $InterfacesPath -ChildPath 'procedures.ps1' -Verbose
 $DefinitionPath   = Join-Path -Path $InterfacesPath -ChildPath 'project_install_definition.ps1' -Verbose
