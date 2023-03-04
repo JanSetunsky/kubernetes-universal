@@ -130,6 +130,7 @@
   "ListOfGitLab": [],
   "ListOfModules": [
     {
+      "Id": "fbdcd989-b37d-47c8-ad90-c6d2808be1c8",
       "Name": "Az.Aks",
       "Status": "is-installed",
       "Installer": "Runspace",
@@ -140,6 +141,7 @@
   ],
   "ListOfPackages": [
     {
+      "Id": "d92ed38a-d5d1-4d65-aeaf-8bbd04650c4a",
       "Name": "Chocolatey",
       "Status": "is-installed",
       "Installer": "Runspace",
@@ -182,6 +184,7 @@
       ]
     },
     {
+      "Id": "befb5ab2-3858-4fa3-8d77-6315d755ef45",
       "Name": "Git",
       "Status": "is-installed",
       "Installer": "Chocolatey",
@@ -256,6 +259,7 @@
       ]
     },
     {
+      "Id": "3ce8da8c-0907-4c72-93c4-6f1ccf5f5ab3",
       "Name": "Docker-Desktop",
       "Status": "is-installed",
       "Installer": "Chocolatey",
@@ -378,6 +382,7 @@
       ]
     },
     {
+      "Id": "aac84daf-bbef-4a71-b7b9-d2d33a987f28",
       "Name": "Kubernetes-CLI",
       "Status": "is-duplicated",
       "Installer": "Chocolatey",
@@ -436,6 +441,7 @@
       ]
     },
     {
+      "Id": "124ba87d-a080-437e-8b5a-ec8a143f9088",
       "Name": "Kubernetes-Helm",
       "Status": "is-installed",
       "Installer": "Chocolatey",
@@ -462,6 +468,7 @@
       ]
     },
     {
+      "Id": "bacbd60c-e897-4f36-ada8-2cbce4d632e0",
       "Name": "MiniKube",
       "Status": "is-installed",
       "Installer": "Chocolatey",

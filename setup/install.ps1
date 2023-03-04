@@ -10,7 +10,7 @@ $PROJECT_BUILDER_SC = {
 $TRIGGER_SWITCH_SC = {
     switch (1..3) {
         1 { $PROJECT_INSTALL_DEFINITION_SC | iex -ErrorAction SilentlyContinue }
-        2 { $PROJECT_GLOBAL_VERIFICATION_SC | iex -ErrorAction SilentlyContinue }
+        2 { $PROJECT_INSTALL_VERIFICATION_SC | iex -ErrorAction SilentlyContinue }
         3 { $PROJECT_BUILDER_SC | iex -ErrorAction SilentlyContinue }
     }
 }
@@ -22,7 +22,7 @@ $InterfacesPath   = Join-Path -Path $DefaultRoot -ChildPath 'interfaces' -Verbos
 $CorePath         = Join-Path -Path $InterfacesPath -ChildPath 'core.ps1' -Verbose
 $ProceduresPath   = Join-Path -Path $InterfacesPath -ChildPath 'procedures.ps1' -Verbose
 $DefinitionPath   = Join-Path -Path $InterfacesPath -ChildPath 'project_install_definition.ps1' -Verbose
-$VerificationPath = Join-Path -Path $InterfacesPath -ChildPath 'project_global_verification.ps1' -Verbose
+$VerificationPath = Join-Path -Path $InterfacesPath -ChildPath 'project_install_verification.ps1' -Verbose
 Import-Module $CorePath
 Import-Module $ProceduresPath
 Import-Module $DefinitionPath

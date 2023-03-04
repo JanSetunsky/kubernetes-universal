@@ -419,6 +419,7 @@ function Build-Project_Environment  {
                                 $ModuleRepositoryPath = $ModuleFilter.RepositoryPath
                                 if($ModuleInstallType -eq 'Decode-Command' -or $ModuleInstallType -eq 'Encode-Command'){
                                     $ModulesDataList += [PSCustomObject]@{
+                                        Id        = $ModuleId
                                         Name      = $ModuleName
                                         Status    = $ModuleStatus
                                         Installer = $ModuleInstallMethod
@@ -455,6 +456,7 @@ function Build-Project_Environment  {
                                 $PackageRepositoryPath = $PackageFilter.RepositoryPath
                                 if($PackageInstallType -eq 'Decode-Command' -or $PackageInstallType -eq 'Encode-Command'){
                                     $PackagesDataList += [PSCustomObject]@{
+                                        Id        = $PackageId
                                         Name      = $PackageName
                                         Status    = $PackageStatus
                                         Installer = $PackageInstallMethod
@@ -476,6 +478,7 @@ function Build-Project_Environment  {
                                         $WebRequest = Invoke-WebRequest -OutFile $ExecutablePath -Uri $PackageRepositoryPath -UseBasicParsing -Verbose
                                     }                            
                                     $PackagesDataList += [PSCustomObject]@{
+                                        Id        = $PackageId
                                         Name      = $PackageName
                                         Status    = $PackageStatus
                                         Installer = $PackageInstallMethod

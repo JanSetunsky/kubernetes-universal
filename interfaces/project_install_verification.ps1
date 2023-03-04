@@ -1,5 +1,5 @@
-#region >> [ PROJECT GLOBAL VERIFICATION ]
-$PROJECT_GLOBAL_VERIFICATION_SC = {
+#region >> [ PROJECT INSTALL VERIFICATION ]
+$PROJECT_INSTALL_VERIFICATION_SC = {
     $RightsResult   = Get-PowerShell_Rights_Management -OperatingSystem $OS_TYPE -Configuration $ConfigData -MeasureDuration $False -ErrorAction Stop
     $VersionResult  = Get-PowerShell_Version_Recognition -OperatingSystem $OS_TYPE -Configuration $ConfigData -MeasureDuration $False -ErrorAction Stop
     $GitHubResult   = Get-GitHub_Availability -OperatingSystem $OS_TYPE -Configuration $ConfigData -GitHubDatabase $GitHubData -MeasureDuration $False -ErrorAction Stop
@@ -14,4 +14,4 @@ $PROJECT_GLOBAL_VERIFICATION_SC = {
         BREAK
     }
 }
-#endregion [ PROJECT GLOBAL VERIFICATION ]
+#endregion [ PROJECT INSTALL VERIFICATION ]
