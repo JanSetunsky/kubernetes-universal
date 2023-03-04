@@ -1,4 +1,4 @@
-# PROCEDURE ITEMS
+# PROCEDURES - MINIKUBE SERVICES
 function PROCEDURE_Start-MiniKube_Server  {
 <#
 .SYNOPSIS
@@ -450,6 +450,9 @@ function PROCEDURE_Get-MiniKube_Server_Status  {
     }
 }
 
+
+
+# PROCEDURES - APP SERVICES
 function PROCEDURE_Deploy-MiniKube_NGINX_DEMO  {
 <#
 .SYNOPSIS
@@ -920,6 +923,9 @@ function PROCEDURE_Delete-MiniKube_NGINX_DEMO  {
     }
 }
 
+
+
+# PROCEDURES - MODULES SERVICES
 function PROCEDURE_Helm-Install_Prometheus  {
 <#
 .SYNOPSIS
