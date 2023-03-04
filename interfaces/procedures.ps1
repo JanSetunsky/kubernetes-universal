@@ -74,7 +74,7 @@ function PROCEDURE_Start-MiniKube_Server  {
                     $MiniKubeStatus.Host -eq 'Stopped' -and
                     $MiniKubeStatus.KubeLet -eq 'Stopped' -and
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
-                    $MiniKubeStatus.KubeConfig -eq 'Stopped'        
+                    $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube server has started running.'
                     $MiniKubeStart = minikube start
