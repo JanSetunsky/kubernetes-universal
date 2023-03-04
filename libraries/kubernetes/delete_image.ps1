@@ -1,6 +1,6 @@
 #region >> [ PROJECT PROCEDURES ]
 $PROJECT_PROCEDURES_SC = {
-    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('MINIKUBE_MONITORING_STACK_Helm_Install_Prometheus_Grafana') -MeasureDuration $True -ErrorAction Stop
+    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('MINIKUBE_DELETE_IMAGE') -MeasureDuration $True -ErrorAction Stop
 }
 #endregion [ PROJECT PROCEDURES ]
 

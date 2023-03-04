@@ -3,11 +3,11 @@ function PROCEDURE_MINIKUBE-Start_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Start-MiniKube_Server
+    PROCEDURE_Start-MiniKube_cluster
 
 .DESCRIPTION
-    First, the status of the server is determined, if it is available, and then 
-    the start of the server itself is started, otherwise the server is already running.
+    First, the status of the cluster is determined, if it is available, and then 
+    the start of the cluster itself is started, otherwise the cluster is already running.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -39,10 +39,11 @@ function PROCEDURE_MINIKUBE-Start_Local_Cluster {
         [PSCustomObject]$OperatingSystem,        
         [Parameter(Position=1,Mandatory=$True)]
         [PSCustomObject]$BuildData,
+        [AllowNull()]
         [Parameter(Position=2,Mandatory=$True)]
-        [Boolean]$MeasureDuration,
-        [Parameter(Position=3,Mandatory=$False)]
-        [PSCustomObject]$ExtraData
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
     )
     begin{
         $DurationBegin = Measure-Command -Expression {
@@ -56,18 +57,28 @@ function PROCEDURE_MINIKUBE-Start_Local_Cluster {
             elseif($OperatingSystem -eq 'Windows'){
                 $Condition = $True
 
-                # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                Write-Host $MiniKubeStatus
 
                 # MiniKube start
-                if(
+                if($MiniKubeStatus -eq 'is-not-exist'){
+                    Write-Host 'MiniKube cluster will now be created.'
+                    $MiniKubeStart = minikube start
+
+                    # Write output
+                    foreach($Output in $MiniKubeStart){
+                        Write-Host $Output
+                    }
+                }
+                elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
                     $MiniKubeStatus.Host -eq 'Running' -and
                     $MiniKubeStatus.KubeLet -eq 'Running' -and
                     $MiniKubeStatus.ApiServer -eq 'Running' -and
                     $MiniKubeStatus.Config -eq 'Configured'
                 ){
-                    Write-Host 'MiniKube server cannot be started.'
+                    Write-Host 'MiniKube cluster cannot be started.'
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
@@ -76,7 +87,7 @@ function PROCEDURE_MINIKUBE-Start_Local_Cluster {
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
-                    Write-Host 'MiniKube server has started running.'
+                    Write-Host 'MiniKube cluster has started running.'
                     $MiniKubeStart = minikube start
 
                     # Write output
@@ -85,7 +96,7 @@ function PROCEDURE_MINIKUBE-Start_Local_Cluster {
                     }
                 }    
                 else{
-                    Write-Warning 'MiniKube server result does not match the conditions.'
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
 
                 Write-Host ''
@@ -124,11 +135,11 @@ function PROCEDURE_MINIKUBE-Stop_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Stop-MiniKube_Server
+    PROCEDURE_Stop-MiniKube_cluster
 
 .DESCRIPTION
-    First, the status of the server is determined, whether it is available, and then 
-    the termination of the server itself is triggered, otherwise the server is shut down.
+    First, the status of the cluster is determined, whether it is available, and then 
+    the termination of the cluster itself is triggered, otherwise the cluster is shut down.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -160,10 +171,11 @@ function PROCEDURE_MINIKUBE-Stop_Local_Cluster {
         [PSCustomObject]$OperatingSystem,        
         [Parameter(Position=1,Mandatory=$True)]
         [PSCustomObject]$BuildData,
+        [AllowNull()]
         [Parameter(Position=2,Mandatory=$True)]
-        [Boolean]$MeasureDuration,
-        [Parameter(Position=3,Mandatory=$False)]
-        [PSCustomObject]$ExtraData
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
     )
     begin{
         $DurationBegin = Measure-Command -Expression {
@@ -177,8 +189,8 @@ function PROCEDURE_MINIKUBE-Stop_Local_Cluster {
             elseif($OperatingSystem -eq 'Windows'){
                 $Condition = $True
 
-                # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube stop
                 if(
@@ -188,7 +200,7 @@ function PROCEDURE_MINIKUBE-Stop_Local_Cluster {
                     $MiniKubeStatus.ApiServer -eq 'Running' -and
                     $MiniKubeStatus.Config -eq 'Configured'
                 ){
-                    Write-Host 'MiniKube server will be shut down.'
+                    Write-Host 'MiniKube cluster will be shut down.'
                     $MiniKubeStop = minikube stop
                 }
                 elseif(
@@ -198,10 +210,135 @@ function PROCEDURE_MINIKUBE-Stop_Local_Cluster {
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
-                    Write-Host 'MiniKube server is already shut down.'
+                    Write-Host 'MiniKube cluster is already shut down.'
                 }    
                 else{
-                    Write-Warning 'MiniKube server result does not match the conditions.'
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                # Write output
+                foreach($Output in $MiniKubeStop){
+                    Write-Host $Output
+                }
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
+
+function PROCEDURE_MINIKUBE-Delete_Local_Cluster {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_Stop-MiniKube_cluster
+
+.DESCRIPTION
+    First, the status of the cluster is determined, whether it is available, and then 
+    the termination of the cluster itself is triggered, otherwise the cluster is shut down.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Success or Failed
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube stop
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    Write-Host 'MiniKube cluster will be shut down.'
+                    $MiniKubeStop = minikube stop
+                    Write-Host 'MiniKube cluster will be deleted.'
+                    $MiniKubeDelete = minikube delete
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                    Write-Host 'MiniKube cluster will be deleted.'
+                    $MiniKubeDelete = minikube delete
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
 
                 # Write output
@@ -244,10 +381,10 @@ function PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Get-MiniKube_Server_Status
+    PROCEDURE_Get-MiniKube_cluster_Status
 
 .DESCRIPTION
-    This function determines the state of the server and then returns a ps custom object
+    This function determines the state of the cluster and then returns a ps custom object
     $MiniKubeOutput = [PSCustomObject]@{
                             Type = $MiniCubeType
                             Host = $MiniKubeHost
@@ -287,10 +424,11 @@ function PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
         [PSCustomObject]$OperatingSystem,        
         [Parameter(Position=1,Mandatory=$True)]
         [PSCustomObject]$BuildData,
+        [AllowNull()]
         [Parameter(Position=2,Mandatory=$True)]
-        [Boolean]$MeasureDuration,
-        [Parameter(Position=3,Mandatory=$False)]
-        [PSCustomObject]$ExtraData
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
     )
     begin{
         $DurationBegin = Measure-Command -Expression {
@@ -305,114 +443,114 @@ function PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
                 $Condition = $True
 
                 # MiniKube status
-                $MiniKubeStatus     = minikube status
-                $MiniKubeType       = $MiniKubeStatus[1]
-                $MiniKubeHost       = $MiniKubeStatus[2]
-                $MiniKubeKubeLet    = $MiniKubeStatus[3]
-                $MiniKubeApiServer  = $MiniKubeStatus[4]
-                $MiniKubeKubeConfig = $MiniKubeStatus[5]
+                $MiniKubeStatus = minikube status
 
-                if($MiniKubeType -match 'Control Plane'){
-                    $MiniKubeType = 'Control Plane'
+                if($MiniKubeStatus -match '\* Profile "minikube" not found.'){
+                    # MiniKube cluster is not exist
+                    $MiniKubeOutput = 'is-not-exist'
                 }
                 else{
-                    $MiniKubeType = 'Uknown'
-                }
-            
-                if($MiniKubeHost -match 'Stopped'){
-                    $MiniKubeHost = 'Stopped'
-                }
-                elseif($MiniKubeHost -match 'Running'){
-                    $MiniKubeHost = 'Running'
-                }
-                else{
-                    $MiniKubeHost = 'Uknown'
-                }
-            
-                if($MiniKubeKubeLet -match 'Stopped'){
-                    $MiniKubeKubeLet = 'Stopped'
-                }
-                elseif($MiniKubeKubeLet -match 'Running'){
-                    $MiniKubeKubeLet = 'Running'
-                }    
-                else{
-                    $MiniKubeKubeLet = 'Uknown'
-                }
-            
-                if($MiniKubeApiServer -match 'Stopped'){
-                    $MiniKubeApiServer = 'Stopped'
-                }
-                elseif($MiniKubeApiServer -match 'Running'){
-                    $MiniKubeApiServer = 'Running'
-                }
-                else{
-                    $MiniKubeApiServer = 'Uknown'
-                }
-            
-                if($MiniKubeKubeConfig -match 'Stopped'){
-                    $MiniKubeKubeConfig = 'Stopped'
-                }
-                elseif($MiniKubeKubeConfig -match 'Configured'){
-                    $MiniKubeKubeConfig = 'Configured'
-                }
-                else{
-                    $MiniKubeKubeConfig = 'Uknown'
-                }
-            
-                # Write output
-                <#
-                foreach($Output in $MiniKubeStatus){
-                    Write-Host $Output
-                }                
-                #>
-            
-                # MiniKube start
-                if(
-                    $MiniKubeType -eq 'Control Plane' -and
-                    $MiniKubeHost -eq 'Running' -and
-                    $MiniKubeKubeLet -eq 'Running' -and
-                    $MiniKubeApiServer -eq 'Running' -and
-                    $MiniKubeKubeConfig -eq 'Configured'
-                ){
-                    Write-Host 'MiniKube server is already running.'
-                    # Create Output
-                    $MiniKubeOutput = [PSCustomObject]@{
-                        Type       = $MiniKubeType
-                        Host       = $MiniKubeHost
-                        KubeLet    = $MiniKubeKubeLet
-                        ApiServer  = $MiniKubeApiServer
-                        Config     = $MiniKubeKubeConfig
-                        IsRunning  = $True
+                    $MiniKubeType       = $MiniKubeStatus[1]
+                    $MiniKubeHost       = $MiniKubeStatus[2]
+                    $MiniKubeKubeLet    = $MiniKubeStatus[3]
+                    $MiniKubeApiServer  = $MiniKubeStatus[4]
+                    $MiniKubeKubeConfig = $MiniKubeStatus[5]
+    
+                    if($MiniKubeType -match 'Control Plane'){
+                        $MiniKubeType = 'Control Plane'
                     }
-                }
-                elseif(
-                    $MiniKubeType -eq 'Control Plane' -and
-                    $MiniKubeHost -eq 'Stopped' -and
-                    $MiniKubeKubeLet -eq 'Stopped' -and
-                    $MiniKubeApiServer -eq 'Stopped' -and
-                    $MiniKubeKubeConfig -eq 'Stopped'        
-                ){
-                    Write-Host 'MiniKube server is down.'
-                    # Create Output
-                    $MiniKubeOutput = [PSCustomObject]@{
-                        Type       = $MiniKubeType
-                        Host       = $MiniKubeHost
-                        KubeLet    = $MiniKubeKubeLet
-                        ApiServer  = $MiniKubeApiServer
-                        Config     = $MiniKubeKubeConfig
-                        IsRunning  = $False
+                    else{
+                        $MiniKubeType = 'Uknown'
                     }
-                }    
-                else{
-                    Write-Warning 'MiniKube server result does not match the conditions.'
-                    # Create Output
-                    $MiniKubeOutput = [PSCustomObject]@{
-                        Type       = $MiniKubeType
-                        Host       = $MiniKubeHost
-                        KubeLet    = $MiniKubeKubeLet
-                        ApiServer  = $MiniKubeApiServer
-                        Config     = $MiniKubeKubeConfig
-                        IsRunning  = $False
+                
+                    if($MiniKubeHost -match 'Stopped'){
+                        $MiniKubeHost = 'Stopped'
+                    }
+                    elseif($MiniKubeHost -match 'Running'){
+                        $MiniKubeHost = 'Running'
+                    }
+                    else{
+                        $MiniKubeHost = 'Uknown'
+                    }
+                
+                    if($MiniKubeKubeLet -match 'Stopped'){
+                        $MiniKubeKubeLet = 'Stopped'
+                    }
+                    elseif($MiniKubeKubeLet -match 'Running'){
+                        $MiniKubeKubeLet = 'Running'
+                    }    
+                    else{
+                        $MiniKubeKubeLet = 'Uknown'
+                    }
+                
+                    if($MiniKubeApiServer -match 'Stopped'){
+                        $MiniKubeApiServer = 'Stopped'
+                    }
+                    elseif($MiniKubeApiServer -match 'Running'){
+                        $MiniKubeApiServer = 'Running'
+                    }
+                    else{
+                        $MiniKubeApiServer = 'Uknown'
+                    }
+                
+                    if($MiniKubeKubeConfig -match 'Stopped'){
+                        $MiniKubeKubeConfig = 'Stopped'
+                    }
+                    elseif($MiniKubeKubeConfig -match 'Configured'){
+                        $MiniKubeKubeConfig = 'Configured'
+                    }
+                    else{
+                        $MiniKubeKubeConfig = 'Uknown'
+                    }
+                
+                    # MiniKube start
+                    if(
+                        $MiniKubeType -eq 'Control Plane' -and
+                        $MiniKubeHost -eq 'Running' -and
+                        $MiniKubeKubeLet -eq 'Running' -and
+                        $MiniKubeApiServer -eq 'Running' -and
+                        $MiniKubeKubeConfig -eq 'Configured'
+                    ){
+                        Write-Host 'MiniKube cluster is already running.'
+                        # Create Output
+                        $MiniKubeOutput = [PSCustomObject]@{
+                            Type       = $MiniKubeType
+                            Host       = $MiniKubeHost
+                            KubeLet    = $MiniKubeKubeLet
+                            ApiServer  = $MiniKubeApiServer
+                            Config     = $MiniKubeKubeConfig
+                            IsRunning  = $True
+                        }
+                    }
+                    elseif(
+                        $MiniKubeType -eq 'Control Plane' -and
+                        $MiniKubeHost -eq 'Stopped' -and
+                        $MiniKubeKubeLet -eq 'Stopped' -and
+                        $MiniKubeApiServer -eq 'Stopped' -and
+                        $MiniKubeKubeConfig -eq 'Stopped'        
+                    ){
+                        Write-Host 'MiniKube cluster is down.'
+                        # Create Output
+                        $MiniKubeOutput = [PSCustomObject]@{
+                            Type       = $MiniKubeType
+                            Host       = $MiniKubeHost
+                            KubeLet    = $MiniKubeKubeLet
+                            ApiServer  = $MiniKubeApiServer
+                            Config     = $MiniKubeKubeConfig
+                            IsRunning  = $False
+                        }
+                    }    
+                    else{
+                        Write-Warning 'MiniKube cluster result does not match the conditions.'
+                        # Create Output
+                        $MiniKubeOutput = [PSCustomObject]@{
+                            Type       = $MiniKubeType
+                            Host       = $MiniKubeHost
+                            KubeLet    = $MiniKubeKubeLet
+                            ApiServer  = $MiniKubeApiServer
+                            Config     = $MiniKubeKubeConfig
+                            IsRunning  = $False
+                        }
                     }
                 }
 
@@ -453,7 +591,7 @@ function PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
 
 
 # KUBERNETES NGINX WEB SERVER
-function PROCEDURE_MINIKUBE-Deploy_Nginx_Service {
+function PROCEDURE_MINIKUBE-Deploy_Nginx_Image {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -493,10 +631,11 @@ function PROCEDURE_MINIKUBE-Deploy_Nginx_Service {
         [PSCustomObject]$OperatingSystem,        
         [Parameter(Position=1,Mandatory=$True)]
         [PSCustomObject]$BuildData,
+        [AllowNull()]
         [Parameter(Position=2,Mandatory=$True)]
-        [Boolean]$MeasureDuration,
-        [Parameter(Position=3,Mandatory=$False)]
-        [PSCustomObject]$ExtraData
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
     )
     begin{
         $DurationBegin = Measure-Command -Expression {
@@ -510,8 +649,8 @@ function PROCEDURE_MINIKUBE-Deploy_Nginx_Service {
             elseif($OperatingSystem -eq 'Windows'){
                 $Condition = $True
 
-                # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -526,11 +665,11 @@ function PROCEDURE_MINIKUBE-Deploy_Nginx_Service {
                         # Navigate to project repository 
                         cd $ProjectPath
 
-                        # Deployment
-                        $DeploymentName  = $ExtraData.DeploymentName
-                        $DeploymentImage = $ExtraData.DeploymentImage
-                        $DeploymentType  = $ExtraData.DeploymentType
-                        $DeploymentPort  = $ExtraData.DeploymentPort
+                        # Procedure data
+                        $DeploymentName  = $ProcedureData.DeploymentName
+                        $DeploymentImage = $ProcedureData.DeploymentImage
+                        $DeploymentType  = $ProcedureData.DeploymentType
+                        $DeploymentPort  = $ProcedureData.DeploymentPort
 
                         # Get deployments
                         $KubeCtlDeployments = kubectl get deployments $DeploymentName
@@ -545,7 +684,7 @@ function PROCEDURE_MINIKUBE-Deploy_Nginx_Service {
 
                         # Validation of deployment
                         if($DeploymentCondition -eq 'is-ready'){
-                            Write-Warning ('MiniKube server already contains deployments named: '+$DeploymentName)
+                            Write-Warning ('MiniKube cluster already contains deployments named: '+$DeploymentName)
                         }
                         elseif($DeploymentCondition -eq 'is-not-ready'){
                             # Create deployment
@@ -563,7 +702,7 @@ function PROCEDURE_MINIKUBE-Deploy_Nginx_Service {
                             }                            
                         }
                         else{
-                            Write-Warning 'MiniKube server triggered an invalid condition'
+                            Write-Warning 'MiniKube cluster triggered an invalid condition'
                         }
                     }
                     else{
@@ -577,10 +716,327 @@ function PROCEDURE_MINIKUBE-Deploy_Nginx_Service {
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
-                    Write-Host 'MiniKube server is already shut down.'
+                    Write-Host 'MiniKube cluster is already shut down.'
                 }    
                 else{
-                    Write-Warning 'MiniKube server result does not match the conditions.'
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
+
+function PROCEDURE_MINIKUBE-Update_Nginx_Image {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_Deploy-MiniKube_NGINX_DEMO
+
+.DESCRIPTION
+    This function deploys NGINX DEMO to kubernetes.
+    External data from the configuration file is used for deployment.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Success or Failed
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube deployment
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath  $ProjectName
+                    if(Test-Path $ProjectPath){
+                        # Navigate to project repository 
+                        cd $ProjectPath
+
+                        # Procedure data
+                        $DeploymentName = $ProcedureData.DeploymentName
+
+                        # Get deployments
+                        $KubeCtlDeployments = kubectl get deployments $DeploymentName
+
+                        # Validation of deployment condition
+                        if($KubeCtlDeployments.Count -ge 1){
+                            $DeploymentCondition = 'is-ready'
+                        }
+                        else{
+                            $DeploymentCondition = 'is-not-ready'
+                        }
+
+                        # Validation of deployment
+                        if($DeploymentCondition -eq 'is-ready'){
+                            Write-Warning ('MiniKube cluster already contains deployments named: '+$DeploymentName)
+                        }
+                        elseif($DeploymentCondition -eq 'is-not-ready'){
+                            # Update deployment
+                            $KubeCtlUpdate = kubectl set image deployment/$DeploymentName 
+
+                            # Write output
+                            foreach($Output in $KubeCtlCreate){
+                                Write-Host $Output
+                            }
+
+                            # Write output
+                            foreach($Output in $KubeCtlExpose){
+                                Write-Host $Output
+                            }                            
+                        }
+                        else{
+                            Write-Warning 'MiniKube cluster triggered an invalid condition'
+                        }
+                    }
+                    else{
+                        Write-Warning 'Project: '+$ProjectPath+'is not exist.'
+                    }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
+
+function PROCEDURE_MINIKUBE-Delete_Nginx_Image {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_Delete-MiniKube_NGINX_DEMO
+
+.DESCRIPTION
+    After deploying NGINX DEMO, this function will uninstall the nginx demo deployment including the service.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Success or Failed
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube deployment
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath  $ProjectName
+                    if(Test-Path $ProjectPath){
+                        cd $ProjectPath
+
+                        # Procedure data
+                        $DeploymentName = $ProcedureData.DeploymentName
+
+                        # Get deployments
+                        $KubeCtlDeployments = kubectl get deployments $DeploymentName
+
+                        # Validation of deployment condition
+                        if($KubeCtlDeployments.Count -ge 1){
+                            $DeploymentCondition = 'is-ready'
+                        }
+                        else{
+                            $DeploymentCondition = 'is-not-ready'
+                        }
+
+                        # Validation of deployment
+                        if($DeploymentCondition -eq 'is-ready'){
+                            # Delete deployment
+                            $KubeCtlDeleteDeployment = kubectl delete deployment $DeploymentName
+                            $KubeCtlDeleteService    = kubectl delete service $DeploymentName
+
+                            # Write output
+                            foreach($Output in $KubeCtlDeleteDeployment){
+                                Write-Host $Output
+                            }
+
+                            # Write output
+                            foreach($Output in $KubeCtlDeleteService){
+                                Write-Host $Output
+                            }           
+                        }
+                        elseif($DeploymentCondition -eq 'is-not-ready'){
+                            # pass
+                        }
+                        else{
+                            # pass
+                        }
+                    }
+                    else{
+                        Write-Warning 'Project: '+$ProjectPath+'is not exist.'
+                    }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
 
                 Write-Host ''
@@ -654,10 +1110,11 @@ function PROCEDURE_MINIKUBE-Get_Nginx_Service {
         [PSCustomObject]$OperatingSystem,        
         [Parameter(Position=1,Mandatory=$True)]
         [PSCustomObject]$BuildData,
+        [AllowNull()]
         [Parameter(Position=2,Mandatory=$True)]
-        [Boolean]$MeasureDuration,
-        [Parameter(Position=3,Mandatory=$False)]
-        [PSCustomObject]$ExtraData
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
     )
     begin{
         $DurationBegin = Measure-Command -Expression {
@@ -671,8 +1128,8 @@ function PROCEDURE_MINIKUBE-Get_Nginx_Service {
             elseif($OperatingSystem -eq 'Windows'){
                 $Condition = $True
 
-                # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -686,8 +1143,8 @@ function PROCEDURE_MINIKUBE-Get_Nginx_Service {
                     if(Test-Path $ProjectPath){
                         cd $ProjectPath
 
-                        # Deployment
-                        $DeploymentName  = "nginx-demo"
+                        # Procedure data
+                        $DeploymentName = $ProcedureData.DeploymentName
 
                         # Get deployments
                         $KubeCtlDeployments = kubectl get deployments $DeploymentName
@@ -728,167 +1185,10 @@ function PROCEDURE_MINIKUBE-Get_Nginx_Service {
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
-                    Write-Host 'MiniKube server is already shut down.'
+                    Write-Host 'MiniKube cluster is already shut down.'
                 }    
                 else{
-                    Write-Warning 'MiniKube server result does not match the conditions.'
-                }
-
-                Write-Host ''
-            }
-            else{
-                $Condition = $False
-            }
-        }
-    }
-    process{
-        $DurationProcess = Measure-Command -Expression {
-            if($Condition){
-                $Result = 'Success'
-            }
-            else{
-                $Result = 'Failed'
-            }
-            Write-Host ('[Result] >>>')
-            Write-Host $Result
-        }
-    }
-    end{
-        $DurationTotal = $DurationBegin+$DurationProcess
-        if($MeasureDuration){
-            $DurationTotal = $DurationBegin+$DurationProcess
-            Write-Host ('DurationBegin:      '+$DurationBegin)
-            Write-Host ('DurationProcess:    '+$DurationProcess)
-            Write-Host ('DurationTotal:      '+$DurationTotal)
-            Write-Host ''
-        }
-        return $Condition
-    }
-}
-
-function PROCEDURE_MINIKUBE-Delete_Nginx_Service {
-<#
-.SYNOPSIS
-    Procedure definition:
-    PROCEDURE_Delete-MiniKube_NGINX_DEMO
-
-.DESCRIPTION
-    After deploying NGINX DEMO, this function will uninstall the nginx demo deployment including the service.
-
-.PARAMETER OperatingSystem
-    String - The operating system parameter specifies which operating system is initialized when the function
-    is run, and the function can respond with a specific command format for that operating system.
-
-.PARAMETER BuildData
-    PSCustomObject shared output from Build-Project_Environment.
-
-.PARAMETER MeasureDuration
-    Condition boolean for generating the function speed measurement result to the console as write-host.
-
-.PARAMETER ExtraData
-    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
-    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
-
-.INPUTS
-    PSCustomObject
-
-.OUTPUTS
-    Success or Failed
-
-.NOTES
-    Author: Jan Setunsky
-    GitHub: https://github.com/JanSetunsky
-#>
-    [CmdletBinding()]
-    param(
-        [Parameter(Position=0,Mandatory=$True)]
-        [PSCustomObject]$OperatingSystem,        
-        [Parameter(Position=1,Mandatory=$True)]
-        [PSCustomObject]$BuildData,
-        [Parameter(Position=2,Mandatory=$True)]
-        [Boolean]$MeasureDuration,
-        [Parameter(Position=3,Mandatory=$False)]
-        [PSCustomObject]$ExtraData
-    )
-    begin{
-        $DurationBegin = Measure-Command -Expression {
-            # Preparation and validation
-            if($OperatingSystem -eq 'Linux'){
-                $Condition = $True
-            }
-            elseif($OperatingSystem -eq 'MacOS'){
-                $Condition = $True
-            }
-            elseif($OperatingSystem -eq 'Windows'){
-                $Condition = $True
-
-                # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
-            
-                # MiniKube deployment
-                if(
-                    $MiniKubeStatus.Type -eq 'Control Plane' -and
-                    $MiniKubeStatus.Host -eq 'Running' -and
-                    $MiniKubeStatus.KubeLet -eq 'Running' -and
-                    $MiniKubeStatus.ApiServer -eq 'Running' -and
-                    $MiniKubeStatus.Config -eq 'Configured'
-                ){
-                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath  $ProjectName
-                    if(Test-Path $ProjectPath){
-                        cd $ProjectPath
-
-                        # Deployment
-                        $DeploymentName  = $ExtraData.DeploymentName
-
-                        # Get deployments
-                        $KubeCtlDeployments = kubectl get deployments $DeploymentName
-
-                        # Validation of deployment condition
-                        if($KubeCtlDeployments.Count -ge 1){
-                            $DeploymentCondition = 'is-ready'
-                        }
-                        else{
-                            $DeploymentCondition = 'is-not-ready'
-                        }
-
-                        # Validation of deployment
-                        if($DeploymentCondition -eq 'is-ready'){
-                            # Delete deployment
-                            $KubeCtlDeleteDeployment = kubectl delete deployment $DeploymentName
-                            $KubeCtlDeleteService    = kubectl delete service $DeploymentName
-
-                            # Write output
-                            foreach($Output in $KubeCtlDeleteDeployment){
-                                Write-Host $Output
-                            }
-
-                            # Write output
-                            foreach($Output in $KubeCtlDeleteService){
-                                Write-Host $Output
-                            }           
-                        }
-                        elseif($DeploymentCondition -eq 'is-not-ready'){
-                            # pass
-                        }
-                        else{
-                            # pass
-                        }
-                    }
-                    else{
-                        Write-Warning 'Project: '+$ProjectPath+'is not exist.'
-                    }
-                }
-                elseif(
-                    $MiniKubeStatus.Type -eq 'Control Plane' -and
-                    $MiniKubeStatus.Host -eq 'Stopped' -and
-                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
-                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
-                    $MiniKubeStatus.Config -eq 'Stopped'        
-                ){
-                    Write-Host 'MiniKube server is already shut down.'
-                }    
-                else{
-                    Write-Warning 'MiniKube server result does not match the conditions.'
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
 
                 Write-Host ''
@@ -965,10 +1265,11 @@ function PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
         [PSCustomObject]$OperatingSystem,        
         [Parameter(Position=1,Mandatory=$True)]
         [PSCustomObject]$BuildData,
+        [AllowNull()]
         [Parameter(Position=2,Mandatory=$True)]
-        [Boolean]$MeasureDuration,
-        [Parameter(Position=3,Mandatory=$False)]
-        [PSCustomObject]$ExtraData
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
     )
     begin{
         $DurationBegin = Measure-Command -Expression {
@@ -982,8 +1283,8 @@ function PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
             elseif($OperatingSystem -eq 'Windows'){
                 $Condition = $True
 
-                # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1005,10 +1306,15 @@ function PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
                             Write-Host "Prometheus is already installed."
                         }
                         else{
+                            # Procedure data
+                            $StackName     = $ProcedureData.StackName
+                            $StackFullName = $ProcedureData.FullName
+                            $StackUri      = $ProcedureData.StackUri
+
                             # Installation
-                            $HelmInstallPrometheusList += helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+                            $HelmInstallPrometheusList += helm repo add $StackFullName $StackUri
                             $HelmInstallPrometheusList += helm repo update
-                            $HelmInstallPrometheusList += helm install prometheus prometheus-community/prometheus
+                            $HelmInstallPrometheusList += helm install $StackName $StackFullName/$StackName
 
                             # Write output
                             foreach($Output in $HelmInstallPrometheusList){
@@ -1041,10 +1347,10 @@ function PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
-                    Write-Host 'MiniKube server is already shut down.'
+                    Write-Host 'MiniKube cluster is already shut down.'
                 }    
                 else{
-                    Write-Warning 'MiniKube server result does not match the conditions.'
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
 
                 Write-Host ''
@@ -1118,10 +1424,11 @@ function PROCEDURE_MINIKUBE-Helm_Install_Grafana {
         [PSCustomObject]$OperatingSystem,        
         [Parameter(Position=1,Mandatory=$True)]
         [PSCustomObject]$BuildData,
+        [AllowNull()]
         [Parameter(Position=2,Mandatory=$True)]
-        [Boolean]$MeasureDuration,
-        [Parameter(Position=3,Mandatory=$False)]
-        [PSCustomObject]$ExtraData
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
     )
     begin{
         $DurationBegin = Measure-Command -Expression {
@@ -1135,8 +1442,8 @@ function PROCEDURE_MINIKUBE-Helm_Install_Grafana {
             elseif($OperatingSystem -eq 'Windows'){
                 $Condition = $True
 
-                # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1158,10 +1465,15 @@ function PROCEDURE_MINIKUBE-Helm_Install_Grafana {
                             Write-Host "Grafana is already installed."
                         }
                         else{
+                            # Procedure data
+                            $StackName     = $ProcedureData.StackName
+                            $StackFullName = $ProcedureData.FullName
+                            $StackUri      = $ProcedureData.StackUri
+
                             # Installation
-                            $HelmInstallGrafanaList += helm repo add grafana https://grafana.github.io/helm-charts
+                            $HelmInstallGrafanaList += helm repo add $StackFullName $StackUri
                             $HelmInstallGrafanaList += helm repo update
-                            $HelmInstallGrafanaList += helm install grafana grafana/grafana
+                            $HelmInstallGrafanaList += helm install $StackName $StackFullName/$StackName
 
                             # Write output
                             foreach($Output in $HelmInstallGrafanaList){
@@ -1194,10 +1506,10 @@ function PROCEDURE_MINIKUBE-Helm_Install_Grafana {
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
-                    Write-Host 'MiniKube server is already shut down.'
+                    Write-Host 'MiniKube cluster is already shut down.'
                 }    
                 else{
-                    Write-Warning 'MiniKube server result does not match the conditions.'
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
 
                 Write-Host ''
@@ -1271,10 +1583,11 @@ function PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana {
         [PSCustomObject]$OperatingSystem,        
         [Parameter(Position=1,Mandatory=$True)]
         [PSCustomObject]$BuildData,
+        [AllowNull()]
         [Parameter(Position=2,Mandatory=$True)]
-        [Boolean]$MeasureDuration,
-        [Parameter(Position=3,Mandatory=$False)]
-        [PSCustomObject]$ExtraData
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
     )
     begin{
         $DurationBegin = Measure-Command -Expression {
@@ -1288,8 +1601,8 @@ function PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana {
             elseif($OperatingSystem -eq 'Windows'){
                 $Condition = $True
 
-                # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1324,9 +1637,13 @@ function PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana {
                         }
 
                         if($PrometheusCondition -and $GrafanaCondition){
+                            # Procedure data
+                            $KubernetesDashboard  = $ProcedureData.KubernetesDashboard
+                            $MonitoringStandalone = $ProcedureData.MonitoringStandalone
+
                             # Installation
-                            $HelmDeployMonitoring += kubectl create -f $ExtraData.KubernetesDashboard --validate=false
-                            $HelmDeployMonitoring += kubectl create -f $ExtraData.MonitoringStandalone --validate=false
+                            $HelmDeployMonitoring += kubectl create -f $KubernetesDashboard --validate=false
+                            $HelmDeployMonitoring += kubectl create -f $MonitoringStandalone --validate=false
 
                             # Write output
                             foreach($Output in $HelmDeployMonitoring){
@@ -1348,10 +1665,10 @@ function PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana {
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
-                    Write-Host 'MiniKube server is already shut down.'
+                    Write-Host 'MiniKube cluster is already shut down.'
                 }    
                 else{
-                    Write-Warning 'MiniKube server result does not match the conditions.'
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
 
                 Write-Host ''

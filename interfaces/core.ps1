@@ -3293,14 +3293,8 @@ function Invoke-Project_Procedures  {
                             $Step++
                             $FunctionName     = $Procedure.Name
                             $MeasureDuration  = $Procedure.MD
-                            $Extra            = $Procedure.Extra
-                            if($Extra){
-                                $ExtraData = $Procedure.Data
-                                $FunctionFullName = $FunctionName+' -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ExtraData $ExtraData'
-                            }
-                            else{
-                                $FunctionFullName = $FunctionName+' -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration'
-                            }
+                            $ProcedureData    = $Procedure.Data
+                            $FunctionFullName = $FunctionName+' -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration'
                             Write-Host ('[ '+$Step+' ][ '+$ProcedureName+' ]--------------------------------')
                             Write-Host ('Name: '+$FunctionName)
                             Write-Host ('[Output] >>>')

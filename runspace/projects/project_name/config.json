@@ -19,31 +19,31 @@
   "InstallingPackages": "True",
   "ListOfProcedures": [
     {
-      "Startup": [
+      "MINIKUBE_START_LOCAL_CLUSTER": [
         {
           "Name": "PROCEDURE_MINIKUBE-Start_Local_Cluster",
           "MD": false,
-          "Extra": false,
           "Data": []
         }
       ],
-      "Delete": [
+      "MINIKUBE_STOP_LOCAL_CLUSTER": [
         {
-          "Name": "PROCEDURE_MINIKUBE-Delete_Nginx_Service",
+          "Name": "PROCEDURE_MINIKUBE-Stop_Local_Cluster",
           "MD": false,
-          "Extra": true,
-          "Data": [
-            {
-              "DeploymentName": "nginx-demo"
-            }
-          ]
+          "Data": []
         }
       ],
-      "Deploy": [
+      "MINIKUBE_DELETE_LOCAL_CLUSTER": [
         {
-          "Name": "PROCEDURE_MINIKUBE-Deploy_Nginx_Service",
+          "Name": "PROCEDURE_MINIKUBE-Delete_Local_Cluster",
           "MD": false,
-          "Extra": true,
+          "Data": []
+        }
+      ],
+      "MINIKUBE_DEPLOY_IMAGE": [
+        {
+          "Name": "PROCEDURE_MINIKUBE-Deploy_Nginx_Image",
+          "MD": false,
           "Data": [
             {
               "DeploymentName": "nginx-demo",
@@ -56,27 +56,71 @@
         {
           "Name": "PROCEDURE_MINIKUBE-Get_Nginx_Service",
           "MD": false,
-          "Extra": false,
-          "Data": []
+          "Data": [
+            {
+              "DeploymentName": "nginx-demo"
+            }
+          ]
         }
       ],
-      "Helm_Install_Prometheus_Grafana": [
+      "MINIKUBE_UPDATE_IMAGE": [
+        {
+          "Name": "PROCEDURE_MINIKUBE-Update_Nginx_Image",
+          "MD": false,
+          "Data": [
+            {
+              "DeploymentName": "nginx-demo",
+              "DeploymentImage": "docker.io/nginx:1.23"
+            }
+          ]
+        },
+        {
+          "Name": "PROCEDURE_MINIKUBE-Get_Nginx_Service",
+          "MD": false,
+          "Data": [
+            {
+              "DeploymentName": "nginx-demo"
+            }
+          ]
+        }
+      ],
+      "MINIKUBE_DELETE_IMAGE": [
+        {
+          "Name": "PROCEDURE_MINIKUBE-Delete_Nginx_Image",
+          "MD": false,
+          "Data": [
+            {
+              "DeploymentName": "nginx-demo"
+            }
+          ]
+        }
+      ],
+      "MINIKUBE_MONITORING_STACK_Helm_Install_Prometheus_Grafana": [
         {
           "Name": "PROCEDURE_MINIKUBE-Helm_Install_Prometheus",
           "MD": false,
-          "Extra": false,
-          "Data": []
+          "Data": [
+            {
+              "StackName": "prometheus",
+              "StackFullName": "prometheus-community",
+              "StackUri": "https://prometheus-community.github.io/helm-charts"
+            }
+          ]
         },
         {
           "Name": "PROCEDURE_MINIKUBE-Helm_Install_Grafana",
           "MD": false,
-          "Extra": false,
-          "Data": []
+          "Data": [
+            {
+              "StackName": "grafana",
+              "StackFullName": "grafana",
+              "StackUri": "https://grafana.github.io/helm-charts"
+            }
+          ]
         },
         {
           "Name": "PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana",
           "MD": false,
-          "Extra": true,
           "Data": [
             {
               "KubernetesDashboard": "https://raw.githubusercontent.com/kubernetes/kops/master/addons/kubernetes-dashboard/v1.8.3.yaml",
@@ -85,15 +129,7 @@
           ]
         }
       ],
-      "any_procedure_name": [],
-      "Stop": [
-        {
-          "Name": "PROCEDURE_MINIKUBE-Stop_Local_Cluster",
-          "MD": false,
-          "Extra": false,
-          "Data": []
-        }
-      ]
+      "any_procedure_name": []
     }
   ],
   "ListOfGitHub": [

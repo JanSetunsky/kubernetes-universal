@@ -1,15 +1,21 @@
 #region >> [ PROJECT PROCEDURES ]
 $PROJECT_PROCEDURES_SC = {
-    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('Stop') -MeasureDuration $True -ErrorAction Stop
+    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('MINIKUBE_UPDATE_IMAGE') -MeasureDuration $True -ErrorAction Stop
 }
 #endregion [ PROJECT PROCEDURES ]
 
 #region >> [ TRIGGER SWITCH ]
 $TRIGGER_SWITCH_SC = {
-    switch (1..3) {
-        1 { $PROJECT_KUBERNETES_DEFINITION_SC | iex -ErrorAction SilentlyContinue }
-        2 { $PROJECT_BUILD_VERIFICATION_SC | iex -ErrorAction SilentlyContinue }
-        3 { $PROJECT_PROCEDURES_SC | iex -ErrorAction SilentlyContinue }
+    if($FullAutomation){
+        # Full automation no longer requires kubernetes definition and complete validation.
+        $PROJECT_PROCEDURES_SC | iex -ErrorAction SilentlyContinue
+    }
+    else{
+        switch (1..3) {
+            1 { $PROJECT_KUBERNETES_DEFINITION_SC | iex -ErrorAction SilentlyContinue }
+            2 { $PROJECT_BUILD_VERIFICATION_SC | iex -ErrorAction SilentlyContinue }
+            3 { $PROJECT_PROCEDURES_SC | iex -ErrorAction SilentlyContinue }
+        }
     }
 }
 #endregion [ DEFAULT SWITCH ]
