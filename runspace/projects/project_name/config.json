@@ -4,9 +4,9 @@
   "ProjectName": "project_name",
   "ProjectType": "Stable",
   "ProjectVersion": "1.0.0.0",
-  "InstallPath": "D:\\NOTINO_TASK\\environment",
-  "RunspacePath": "D:\\NOTINO_TASK\\runspace",
-  "ProjectsPath": "D:\\NOTINO_TASK\\runspace\\projects",
+  "InstallPath": "D:\\github\\kubernetes-universal\\environment",
+  "RunspacePath": "D:\\github\\kubernetes-universal\\runspace",
+  "ProjectsPath": "D:\\github\\kubernetes-universal\\runspace\\projects",
   "OS": "Windows",
   "Platform": "Win32NT",
   "Architecture": "AMD64",
@@ -121,10 +121,10 @@
           "Token": false,
           "Update": "fetch",
           "Status": "is-downloaded",
-          "Path": "D:\\NOTINO_TASK\\runspace\\projects\\project_name\\github\\nginxinc\\kubernetes-ingress"
+          "Path": "D:\\github\\kubernetes-universal\\runspace\\projects\\project_name\\github\\nginxinc\\kubernetes-ingress"
         }
       ],
-      "Path": "D:\\NOTINO_TASK\\runspace\\projects\\project_name\\github\\nginxinc"
+      "Path": "D:\\github\\kubernetes-universal\\runspace\\projects\\project_name\\github\\nginxinc"
     }
   ],
   "ListOfGitLab": [],

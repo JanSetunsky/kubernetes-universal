@@ -12,7 +12,7 @@ $PROJECT_DEFINITION_SC = {
     }
     elseif($OS_TYPE -eq 'Windows'){
         # Default root path
-        $DefaultPath      = $ScriptRoot
+        $DefaultPath      = $DefaultRoot
         # Runspace paths
         $RunspacePath     = $DefaultPath+'\runspace'
         # Project paths
@@ -28,14 +28,20 @@ $PROJECT_DEFINITION_SC = {
         $PackagesPath     = $DatabasePath+'\packages.json'        
         # CONFIG DATABASE
         if(Test-Path $ConfigPath){
-            $ConfigGc   = Get-Content $ConfigPath -Force
-            $ConfigData = $ConfigGc|ConvertFrom-Json -Depth 100
-            $ConfigData.InstallPath  = $EnvironmentPath
-            $ConfigData.ProjectsPath = $ProjectsPath
-            $ConfigData.RunspacePath = $RunspacePath
+            $ConfigGc    = Get-Content $ConfigPath -Force
+            $ConfigData  = $ConfigGc|ConvertFrom-Json -Depth 100
+            $ProjectName = $ConfigData.ProjectName
+            $BuildPath   = $ProjectsPath+'\'+$ProjectName+'\config.json'
+            if(Test-Path $BuildPath){
+                $BuildGc   = Get-Content $BuildPath -Force
+                $BuildData = $BuildGc|ConvertFrom-Json -Depth 100
+            }
+            else{
+                $BuildData = $null
+            }
         }
         else{
-            $ConfigData = $null
+            $BuildData = $null
         }
         # GITHUB DATABASE
         if(Test-Path $GitHubPath){
@@ -94,28 +100,29 @@ $PROJECT_VERIFICATION_SC = {
 }
 #endregion [ PROJECT VERIFICATION ]
 
-#region >> [ PROJECT BUILDER ]
-$PROJECT_BUILDER_SC = {
-    $BuildData = Build-Project_Environment -OperatingSystem $OS_TYPE -Configuration $ConfigData -GitHubDatabase $GitHubData -GitLabDatabase $GitLabData -ModuleDatabase $ModulesData -PackageDatabase $PackagesData -MeasureDuration $False -ErrorAction Stop
-    $Install   = Install-Project_Environment -OperatingSystem $OS_TYPE -BuildData $BuildData -MeasureDuration $False -ErrorAction Stop    
-    $Save      = Save-Project_Environment -OperatingSystem $OS_TYPE -BuildData $BuildData -MeasureDuration $False -ErrorAction Stop
+#region >> [ PROJECT PROCEDURES ]
+$PROJECT_PROCEDURES_SC = {
+    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('Helm_Install_Prometheus_Grafana') -MeasureDuration $True -ErrorAction Stop
 }
-#endregion [ PROJECT BUILDER ]
+#endregion [ PROJECT PROCEDURES ]
 
 #region >> [ TRIGGER SWITCH ]
 $TRIGGER_SWITCH_SC = {
     switch (1..3) {
-        1 { $PROJECT_DEFINITION_SC | iex -ErrorAction SilentlyContinue }
+        1 { $PROJECT_DEFINITION_SC   | iex -ErrorAction SilentlyContinue }
         2 { $PROJECT_VERIFICATION_SC | iex -ErrorAction SilentlyContinue }
-        3 { $PROJECT_BUILDER_SC | iex -ErrorAction SilentlyContinue }
+        3 { $PROJECT_PROCEDURES_SC   | iex -ErrorAction SilentlyContinue }
     }
 }
 #endregion [ DEFAULT SWITCH ]
 
-$ScriptRoot     = $PSScriptRoot
-$FunctionsPath  = Join-Path -Path $ScriptRoot -ChildPath 'functions.ps1' -Verbose
-$ProceduresPath = Join-Path -Path $ScriptRoot -ChildPath 'procedures.ps1' -Verbose
-Import-Module $FunctionsPath
+$ScriptsRoot    = $PSScriptRoot
+$LibrariesRoot  = Split-Path $ScriptsRoot -Parent
+$DefaultRoot    = Split-Path $LibrariesRoot -Parent
+$InterfacesPath = Join-Path -Path $LibrariesRoot -ChildPath 'interfaces' -Verbose
+$CorePath       = Join-Path -Path $InterfacesPath -ChildPath 'core.ps1' -Verbose
+$ProceduresPath = Join-Path -Path $InterfacesPath -ChildPath 'procedures.ps1' -Verbose
+Import-Module $CorePath
 Import-Module $ProceduresPath
 $MeasureCommand = Measure-Command -Expression {
     $TRIGGER_SWITCH_SC | iex -ErrorAction SilentlyContinue

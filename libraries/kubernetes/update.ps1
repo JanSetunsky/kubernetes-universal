@@ -12,7 +12,7 @@ $PROJECT_DEFINITION_SC = {
     }
     elseif($OS_TYPE -eq 'Windows'){
         # Default root path
-        $DefaultPath      = $ScriptRoot
+        $DefaultPath      = $DefaultRoot
         # Runspace paths
         $RunspacePath     = $DefaultPath+'\runspace'
         # Project paths
@@ -31,11 +31,10 @@ $PROJECT_DEFINITION_SC = {
             $ConfigGc    = Get-Content $ConfigPath -Force
             $ConfigData  = $ConfigGc|ConvertFrom-Json -Depth 100
             $ProjectName = $ConfigData.ProjectName
-            $ConfigPath  = $ProjectsPath+'\'+$ProjectName+'\config.json'
-            Write-Host $ConfigPath
-            if(Test-Path $ConfigPath){
-                $ConfigGc  = Get-Content $ConfigPath -Force
-                $BuildData = $ConfigGc|ConvertFrom-Json -Depth 100
+            $BuildPath   = $ProjectsPath+'\'+$ProjectName+'\config.json'
+            if(Test-Path $BuildPath){
+                $BuildGc   = Get-Content $BuildPath -Force
+                $BuildData = $BuildGc|ConvertFrom-Json -Depth 100
             }
             else{
                 $BuildData = $null
@@ -103,7 +102,7 @@ $PROJECT_VERIFICATION_SC = {
 
 #region >> [ PROJECT PROCEDURES ]
 $PROJECT_PROCEDURES_SC = {
-    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('Delete') -MeasureDuration $True -ErrorAction Stop
+    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('Update') -MeasureDuration $True -ErrorAction Stop
 }
 #endregion [ PROJECT PROCEDURES ]
 
@@ -117,10 +116,13 @@ $TRIGGER_SWITCH_SC = {
 }
 #endregion [ DEFAULT SWITCH ]
 
-$ScriptRoot     = $PSScriptRoot
-$FunctionsPath  = Join-Path -Path $ScriptRoot -ChildPath 'functions.ps1' -Verbose
-$ProceduresPath = Join-Path -Path $ScriptRoot -ChildPath 'procedures.ps1' -Verbose
-Import-Module $FunctionsPath
+$ScriptsRoot    = $PSScriptRoot
+$LibrariesRoot  = Split-Path $ScriptsRoot -Parent
+$DefaultRoot    = Split-Path $LibrariesRoot -Parent
+$InterfacesPath = Join-Path -Path $LibrariesRoot -ChildPath 'interfaces' -Verbose
+$CorePath       = Join-Path -Path $InterfacesPath -ChildPath 'core.ps1' -Verbose
+$ProceduresPath = Join-Path -Path $InterfacesPath -ChildPath 'procedures.ps1' -Verbose
+Import-Module $CorePath
 Import-Module $ProceduresPath
 $MeasureCommand = Measure-Command -Expression {
     $TRIGGER_SWITCH_SC | iex -ErrorAction SilentlyContinue
