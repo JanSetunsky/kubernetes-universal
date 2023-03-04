@@ -3291,10 +3291,9 @@ function Invoke-Project_Procedures  {
                         $Step = 0
                         foreach($Procedure in $ListOfProcedures.$ProcedureName){
                             $Step++
-                            $Name             = $Procedure.Name
+                            $FunctionName     = $Procedure.Name
                             $MeasureDuration  = $Procedure.MD
                             $Extra            = $Procedure.Extra
-                            $FunctionName     = 'PROCEDURE_'+$Name
                             if($Extra){
                                 $ExtraData = $Procedure.Data
                                 $FunctionFullName = $FunctionName+' -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ExtraData $ExtraData'

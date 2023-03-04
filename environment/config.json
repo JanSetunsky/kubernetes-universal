@@ -22,7 +22,7 @@
     {
       "Startup": [
         {
-          "Name": "Start-MiniKube_Server",
+          "Name": "PROCEDURE_MINIKUBE-Start_Local_Cluster",
           "MD": false,
           "Extra": false,
           "Data":[]
@@ -30,7 +30,7 @@
       ],
       "Delete": [
         {
-          "Name": "Delete-MiniKube_NGINX_DEMO",
+          "Name": "PROCEDURE_MINIKUBE-Delete_Nginx_Service",
           "MD": false,
           "Extra": true,
           "Data":[{
@@ -40,7 +40,7 @@
       ],
       "Deploy": [
         {
-          "Name": "Deploy-MiniKube_NGINX_DEMO",
+          "Name": "PROCEDURE_MINIKUBE-Deploy_Nginx_Service",
           "MD": false,
           "Extra": true,
           "Data":[{
@@ -51,7 +51,7 @@
           }]
         },
         {
-          "Name": "Get-Services_MiniKube_NGINX_DEMO",
+          "Name": "PROCEDURE_MINIKUBE-Get_Nginx_Service",
           "MD": false,
           "Extra": false,
           "Data":[]
@@ -59,19 +59,19 @@
       ],
       "Helm_Install_Prometheus_Grafana": [
         {
-          "Name": "Helm-Install_Prometheus",
+          "Name": "PROCEDURE_MINIKUBE-Helm_Install_Prometheus",
           "MD": false,
           "Extra": false,
           "Data":[]
         },
         {
-          "Name": "Helm-Install_Grafana",
+          "Name": "PROCEDURE_MINIKUBE-Helm_Install_Grafana",
           "MD": false,
           "Extra": false,
           "Data":[]
         },
         {
-          "Name": "Helm-Deploy_Prometheus_And_Grafana",
+          "Name": "PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana",
           "MD": false,
           "Extra": true,
           "Data":[{
@@ -83,7 +83,7 @@
       "any_procedure_name": [],
       "Stop": [
         {
-          "Name": "Stop-MiniKube_Server",
+          "Name": "PROCEDURE_MINIKUBE-Stop_Local_Cluster",
           "MD": false,
           "Extra": false,
           "Data":[]

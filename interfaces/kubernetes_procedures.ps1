@@ -1,5 +1,5 @@
-# PROCEDURES - KUBERNETES SERVICES
-function PROCEDURE_Start-MiniKube_Server  {
+# KUBERNETES SERVICES
+function PROCEDURE_MINIKUBE-Start_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -57,7 +57,7 @@ function PROCEDURE_Start-MiniKube_Server  {
                 $Condition = $True
 
                 # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_Get-MiniKube_Server_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
 
                 # MiniKube start
                 if(
@@ -120,7 +120,7 @@ function PROCEDURE_Start-MiniKube_Server  {
     }
 }
 
-function PROCEDURE_Stop-MiniKube_Server  {
+function PROCEDURE_MINIKUBE-Stop_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -178,7 +178,7 @@ function PROCEDURE_Stop-MiniKube_Server  {
                 $Condition = $True
 
                 # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_Get-MiniKube_Server_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube stop
                 if(
@@ -240,7 +240,7 @@ function PROCEDURE_Stop-MiniKube_Server  {
     }
 }
 
-function PROCEDURE_Get-MiniKube_Server_Status  {
+function PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -452,8 +452,8 @@ function PROCEDURE_Get-MiniKube_Server_Status  {
 
 
 
-# PROCEDURES - KUBERNETES FEATURES
-function PROCEDURE_Deploy-MiniKube_NGINX_DEMO  {
+# KUBERNETES FEATURES
+function PROCEDURE_MINIKUBE-Deploy_Nginx_Service {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -511,7 +511,7 @@ function PROCEDURE_Deploy-MiniKube_NGINX_DEMO  {
                 $Condition = $True
 
                 # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_Get-MiniKube_Server_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -615,7 +615,7 @@ function PROCEDURE_Deploy-MiniKube_NGINX_DEMO  {
     }
 }
 
-function PROCEDURE_Get-Services_MiniKube_NGINX_DEMO  {
+function PROCEDURE_MINIKUBE-Get_Nginx_Service {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -672,7 +672,7 @@ function PROCEDURE_Get-Services_MiniKube_NGINX_DEMO  {
                 $Condition = $True
 
                 # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_Get-MiniKube_Server_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -766,7 +766,7 @@ function PROCEDURE_Get-Services_MiniKube_NGINX_DEMO  {
     }
 }
 
-function PROCEDURE_Delete-MiniKube_NGINX_DEMO  {
+function PROCEDURE_MINIKUBE-Delete_Nginx_Service {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -823,7 +823,7 @@ function PROCEDURE_Delete-MiniKube_NGINX_DEMO  {
                 $Condition = $True
 
                 # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_Get-MiniKube_Server_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -925,8 +925,8 @@ function PROCEDURE_Delete-MiniKube_NGINX_DEMO  {
 
 
 
-# PROCEDURES - KUBERNETES MODULES
-function PROCEDURE_Helm-Install_Prometheus  {
+# KUBERNETES MODULES
+function PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -983,7 +983,7 @@ function PROCEDURE_Helm-Install_Prometheus  {
                 $Condition = $True
 
                 # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_Get-MiniKube_Server_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1079,7 +1079,7 @@ function PROCEDURE_Helm-Install_Prometheus  {
     }
 }
 
-function PROCEDURE_Helm-Install_Grafana  {
+function PROCEDURE_MINIKUBE-Helm_Install_Grafana {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1136,7 +1136,7 @@ function PROCEDURE_Helm-Install_Grafana  {
                 $Condition = $True
 
                 # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_Get-MiniKube_Server_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1232,7 +1232,7 @@ function PROCEDURE_Helm-Install_Grafana  {
     }
 }
 
-function PROCEDURE_Helm-Deploy_Prometheus_And_Grafana  {
+function PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1289,7 +1289,7 @@ function PROCEDURE_Helm-Deploy_Prometheus_And_Grafana  {
                 $Condition = $True
 
                 # MiniKube server availability verification
-                $MiniKubeStatus = PROCEDURE_Get-MiniKube_Server_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
