@@ -3294,6 +3294,7 @@ function Invoke-Project_Procedures  {
                             $FunctionName     = $Procedure.Name
                             $MeasureDuration  = $Procedure.MD
                             $ProcedureData    = $Procedure.Data
+                            Write-Host $ProcedureData
                             $FunctionFullName = $FunctionName+' -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration'
                             Write-Host ('[ '+$Step+' ][ '+$ProcedureName+' ]--------------------------------')
                             Write-Host ('Name: '+$FunctionName)

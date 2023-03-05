@@ -59,7 +59,6 @@ function PROCEDURE_MINIKUBE-Start_Local_Cluster {
 
                 # MiniKube cluster availability verification
                 $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
-                Write-Host $MiniKubeStatus
 
                 # MiniKube start
                 if($MiniKubeStatus -eq 'is-not-exist'){
@@ -1284,7 +1283,7 @@ function PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $null -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1308,7 +1307,7 @@ function PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
                         else{
                             # Procedure data
                             $StackName     = $ProcedureData.StackName
-                            $StackFullName = $ProcedureData.FullName
+                            $StackFullName = $ProcedureData.StackFullName
                             $StackUri      = $ProcedureData.StackUri
 
                             # Installation
@@ -1467,7 +1466,7 @@ function PROCEDURE_MINIKUBE-Helm_Install_Grafana {
                         else{
                             # Procedure data
                             $StackName     = $ProcedureData.StackName
-                            $StackFullName = $ProcedureData.FullName
+                            $StackFullName = $ProcedureData.StackFullName
                             $StackUri      = $ProcedureData.StackUri
 
                             # Installation

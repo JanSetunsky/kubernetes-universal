@@ -1,31 +1,40 @@
-#region >> [ PROJECT AUTORUN ]
-$PROJECT_AUTORUN_SC = {
-    $FULL_AUTOMATION = $True
-    .$InstallEnvironmentPath
-    .$StartLocalClusterPath
-    .$InstallMonitoringStackPath
-    .$DeployImagePath
+#region >> [ PROJECT BUILDER ]
+$PROJECT_BUILDER_SC = {
+    $BuildData = Build-Project_Environment -OperatingSystem $OS_TYPE -Configuration $ConfigData -GitHubDatabase $GitHubData -GitLabDatabase $GitLabData -ModuleDatabase $ModulesData -PackageDatabase $PackagesData -MeasureDuration $False -ErrorAction Stop
+    $Install   = Install-Project_Environment -OperatingSystem $OS_TYPE -BuildData $BuildData -MeasureDuration $False -ErrorAction Stop    
+    $Save      = Save-Project_Environment -OperatingSystem $OS_TYPE -BuildData $BuildData -MeasureDuration $False -ErrorAction Stop
 }
-#endregion [ PROJECT AUTORUN ]
+#endregion [ PROJECT BUILDER ]
+
+#region >> [ PROJECT PROCEDURES ]
+$PROJECT_PROCEDURES_SC = {
+    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('MINIKUBE_START_LOCAL_CLUSTER','MINIKUBE_MONITORING_STACK_Helm_Install_Prometheus_Grafana','MINIKUBE_DEPLOY_IMAGE') -MeasureDuration $True -ErrorAction Stop
+}
+#endregion [ PROJECT PROCEDURES ]
 
 #region >> [ TRIGGER SWITCH ]
 $TRIGGER_SWITCH_SC = {
-    switch (1) {
-        1 { $PROJECT_AUTORUN_SC | iex -ErrorAction SilentlyContinue }
+    switch (1..4) {
+        1 { $PROJECT_INSTALL_DEFINITION_SC | iex -ErrorAction SilentlyContinue }
+        2 { $PROJECT_INSTALL_VERIFICATION_SC | iex -ErrorAction SilentlyContinue }
+        3 { $PROJECT_BUILDER_SC | iex -ErrorAction SilentlyContinue }
+        4 { $PROJECT_PROCEDURES_SC | iex -ErrorAction SilentlyContinue }
     }
 }
 #endregion [ DEFAULT SWITCH ]
 
-# Installation paths
-$ScriptRoot                 = $PSScriptRoot
-$DefaultRoot                = Split-Path $ScriptRoot -Parent
-$LibrariesPath              = Join-Path -Path $DefaultRoot -ChildPath 'libraries' -Verbose
-$KubernetesPath             = Join-Path -Path $LibrariesPath -ChildPath 'kubernetes' -Verbose
-$InstallEnvironmentPath     = Join-Path -Path $ScriptRoot -ChildPath 'install_environment.ps1' -Verbose
-$StartLocalClusterPath      = Join-Path -Path $KubernetesPath -ChildPath 'start_local_cluster.ps1' -Verbose
-$InstallMonitoringStackPath = Join-Path -Path $KubernetesPath -ChildPath 'install_prometheus-grafana.ps1' -Verbose
-$DeployImagePath            = Join-Path -Path $KubernetesPath -ChildPath 'deploy_image.ps1' -Verbose
-
+$ScriptRoot       = $PSScriptRoot
+$DefaultRoot      = Split-Path $ScriptRoot -Parent
+$InterfacesPath   = Join-Path -Path $DefaultRoot -ChildPath 'interfaces' -Verbose
+$CorePath         = Join-Path -Path $InterfacesPath -ChildPath 'core.ps1' -Verbose
+$ProceduresPath   = Join-Path -Path $InterfacesPath -ChildPath 'kubernetes_procedures.ps1' -Verbose
+$DefinitionPath   = Join-Path -Path $InterfacesPath -ChildPath 'installation_definition.ps1' -Verbose
+$VerificationPath = Join-Path -Path $InterfacesPath -ChildPath 'installation_verification.ps1' -Verbose
+$FULL_AUTOMATION  = $True
+Import-Module $CorePath
+Import-Module $ProceduresPath
+Import-Module $DefinitionPath
+Import-Module $VerificationPath
 $MeasureCommand = Measure-Command -Expression {
     $TRIGGER_SWITCH_SC | iex -ErrorAction SilentlyContinue
 }
