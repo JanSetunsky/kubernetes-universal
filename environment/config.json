@@ -86,7 +86,7 @@
           }]
         }
       ],
-      "MINIKUBE_MONITORING_STACK_Helm_Install_Prometheus_Grafana": [
+      "MINIKUBE_OBSERVABILITY_STACK_Helm_Install_Prometheus_Grafana": [
         {
           "Name": "PROCEDURE_MINIKUBE-Helm_Install_Prometheus",
           "MD": false,
@@ -106,12 +106,33 @@
           }]
         },
         {
-          "Name": "PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana",
+          "Name": "PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard",
           "MD": false,
           "Data":[{
-            "KubernetesDashboard": "https://raw.githubusercontent.com/kubernetes/kops/master/addons/kubernetes-dashboard/v1.8.3.yaml",
+            "KubernetesDashboard": "https://raw.githubusercontent.com/kubernetes/kops/master/addons/kubernetes-dashboard/v1.8.3.yaml"
+          }]
+        },
+        {
+          "Name": "PROCEDURE_MINIKUBE-Create_Monitoring_Standalone",
+          "MD": false,
+          "Data":[{
             "MonitoringStandalone": "https://raw.githubusercontent.com/kubernetes/kops/master/addons/monitoring-standalone/v1.8.3.yaml"
           }]
+        },
+        {
+          "Name": "PROCEDURE_MINIKUBE-Create_Service_Prometheus",
+          "MD": false,
+          "Data":[]
+        },
+        {
+          "Name": "PROCEDURE_MINIKUBE-Create_Cluster_Prometheus_Role",
+          "MD": false,
+          "Data":[]
+        },
+        {
+          "Name": "PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration",
+          "MD": false,
+          "Data":[]
         }
       ],
       "any_procedure_name": []

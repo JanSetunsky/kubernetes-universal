@@ -1224,7 +1224,7 @@ function PROCEDURE_MINIKUBE-Get_Nginx_Service {
 
 
 
-# KUBERNETES MONITORING STACK
+# KUBERNETES OBSERVABILITY STACK INSTALLATION
 function PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
 <#
 .SYNOPSIS
@@ -1543,7 +1543,7 @@ function PROCEDURE_MINIKUBE-Helm_Install_Grafana {
     }
 }
 
-function PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana {
+function PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1615,7 +1615,7 @@ function PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana {
                     if(Test-Path $ProjectPath){
                         cd $ProjectPath
 
-                        $HelmDeployMonitoring = @()
+                        $CreateKubernetesDashboard = @()
 
                         # Re-Verify helm list
                         $HelmList = helm list
@@ -1636,16 +1636,14 @@ function PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana {
                         }
 
                         if($PrometheusCondition -and $GrafanaCondition){
-                            # Procedure data
+                            # Data
                             $KubernetesDashboard  = $ProcedureData.KubernetesDashboard
-                            $MonitoringStandalone = $ProcedureData.MonitoringStandalone
 
-                            # Installation
-                            $HelmDeployMonitoring += kubectl create -f $KubernetesDashboard --validate=false
-                            $HelmDeployMonitoring += kubectl create -f $MonitoringStandalone --validate=false
+                            # Create
+                            $CreateKubernetesDashboard += kubectl create -f $KubernetesDashboard --validate=false
 
                             # Write output
-                            foreach($Output in $HelmDeployMonitoring){
+                            foreach($Output in $CreateKubernetesDashboard){
                                 Write-Host $Output
                             }
                         }
@@ -1701,3 +1699,942 @@ function PROCEDURE_MINIKUBE-Helm_Deploy_Prometheus_Grafana {
         return $Condition
     }
 }
+
+function PROCEDURE_MINIKUBE-Create_Monitoring_Standalone {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_Helm-Deploy_Prometheus_And_Grafana
+
+.DESCRIPTION
+    Deploying prometheus and grafana to the minicube.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Boolean
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube deployment
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath  $ProjectName
+                    if(Test-Path $ProjectPath){
+                        cd $ProjectPath
+
+                        $CreateMonitoringStandalone = @()
+
+                        # Re-Verify helm list
+                        $HelmList = helm list
+                        if($HelmList -match "prometheus"){
+                            $PrometheusCondition = $True
+                        }
+                        else{
+                            $PrometheusCondition = $False
+                            Write-Warning "Prometheus is not installed."
+                        }
+
+                        if($HelmList -match "grafana"){
+                            $GrafanaCondition = $True
+                        }
+                        else{
+                            $GrafanaCondition = $False
+                            Write-Warning "Grafana is not installed."
+                        }
+
+                        if($PrometheusCondition -and $GrafanaCondition){
+                            # Data
+                            $MonitoringStandalone = $ProcedureData.MonitoringStandalone
+
+                            # Create
+                            $CreateMonitoringStandalone += kubectl create -f $MonitoringStandalone --validate=false
+
+                            # Write output
+                            foreach($Output in $CreateMonitoringStandalone){
+                                Write-Host $Output
+                            }
+                        }
+                        else{
+                            Write-Warning "Helm deploy monitoring is not completed."
+                        }
+                    }
+                    else{
+                        Write-Warning 'Project: '+$ProjectPath+'is not exist.'
+                    }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
+
+function PROCEDURE_MINIKUBE-Create_Service_Account_Prometheus {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_MINIKUBE-Deploy_Prometheus_Observability_Stack
+
+.DESCRIPTION
+    Deploying prometheus and grafana to the minicube.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Boolean
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube deployment
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath  $ProjectName
+                    if(Test-Path $ProjectPath){
+                        cd $ProjectPath
+
+                        $KubeCtlGetServiceAccounts   = @()
+                        $KubeCtlCreateServiceAccount = @()
+                        $ServiceAccountCondition     = @()
+
+                        $KubeCtlGetServiceAccounts += kubectl get serviceaccounts
+
+                        # Write output
+                        foreach($Output in $KubeCtlGetServiceAccounts){
+                            Write-Host $Output
+                        }
+
+                        # Find current service account
+                        foreach($ServiceAccount in $KubeCtlGetServiceAccounts){
+                            if($ServiceAccount -notmatch 'prometheus-' -and $ServiceAccount -match 'prometheus'){
+                                $ServiceAccountCondition += $True
+                            }
+                            else{
+                                $ServiceAccountCondition += $False
+                            }
+                        }
+
+                        # Compare service accounts condition
+                        if($ServiceAccountCondition.Count -gt 1){
+                            if($ServiceAccountCondition -match $True){
+                                Write-Warning 'Service deployment for prometheus already exists.'
+                            }
+                            else{
+                                Write-Host 'Service observability stack deployment for prometheus is now running.'
+                                $KubeCtlCreateServiceAccount = kubectl create serviceaccount prometheus
+                            }
+                        }
+                        elseif($ServiceAccountCondition.Count -eq 1){
+                            if($ServiceAccountCondition -eq $True){
+                                Write-Warning 'Service deployment for prometheus already exists.'
+                            }
+                            else{
+                                Write-Host 'Service observability stack deployment for prometheus is now running.'
+                                $KubeCtlCreateServiceAccount = kubectl create serviceaccount prometheus
+                            }
+                        }
+                        else{
+                            Write-Warning 'The result for comparing service accounts is not valid.'
+                        }
+
+                        # Write output
+                        foreach($Output in $KubeCtlCreateServiceAccount){
+                            Write-Host $Output
+                        }
+
+                    }
+                    else{
+                        Write-Warning 'Project: '+$ProjectPath+'is not exist.'
+                    }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
+
+function PROCEDURE_MINIKUBE-Create_Cluster_Prometheus_Role {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_MINIKUBE-Deploy_Prometheus_Observability_Stack
+
+.DESCRIPTION
+    Deploying prometheus and grafana to the minicube.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Boolean
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube deployment
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath  $ProjectName
+                    if(Test-Path $ProjectPath){
+                        cd $ProjectPath
+
+                        # Create paths
+                        $ProjectClusterRolePath        = Join-Path -Path $ProjectPath -ChildPath 'cluster_role'
+                        $PrometheusRoleYamlPath        = Join-Path -Path $ProjectClusterRolePath -ChildPath 'prometheus-role.yaml'
+                        $PrometheusRoleBindingYamlPath = Join-Path -Path $ProjectClusterRolePath -ChildPath 'prometheus-role-binding.yaml'
+                        $PrometheusRoleYamlContent = (
+@"
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: prometheus
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - nodes/proxy
+  - services
+  - endpoints
+  - pods
+  verbs: ["get", "list", "watch"]
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch"]
+- nonResourceURLs: ["/metrics"]
+  verbs: ["get"]
+"@
+                        )
+
+                        $PrometheusRoleBindingYamlContent = (
+@"
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: prometheus
+  apiGroup: rbac.authorization.k8s.io
+"@
+                        )
+
+                        # Create cluster role directory
+                        if(Test-Path $ProjectClusterRolePath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectClusterRolePath -Force -Verbose
+                        }
+
+                        # Create prometheus_role.yaml file
+                        if(Test-Path $PrometheusRoleYamlPath){
+                            $SetContent = Set-Content -Path $PrometheusRoleYamlPath -Value $PrometheusRoleYamlContent -Force -Verbose
+                        }
+                        else{
+                            $NewItem    = New-Item -ItemType File -Path $PrometheusRoleYamlPath -Force -Verbose
+                            $SetContent = Set-Content -Path $PrometheusRoleYamlPath -Value $PrometheusRoleYamlContent -Force -Verbose
+                        }
+
+                        # Create prometheus_role-binding.yaml file
+                        if(Test-Path $PrometheusRoleBindingYamlPath){
+                            $SetContent = Set-Content -Path $PrometheusRoleBindingYamlPath -Value $PrometheusRoleBindingYamlContent -Force -Verbose
+                        }
+                        else{
+                            $NewItem    = New-Item -ItemType File -Path $PrometheusRoleBindingYamlPath -Force -Verbose
+                            $SetContent = Set-Content -Path $PrometheusRoleBindingYamlPath -Value $PrometheusRoleBindingYamlContent -Force -Verbose
+                        }
+
+                        $ServiceAccountCondition    = @()
+                        $KubeCtlGetServiceAccounts  = @()
+                        $KubeCtlApplyPrometheusRole = @()
+
+                        # Get service account list
+                        $KubeCtlGetServiceAccounts += kubectl get serviceaccounts
+
+                        # Write output
+                        foreach($Output in $KubeCtlGetServiceAccounts){
+                            Write-Host $Output
+                        }
+
+                        # Find current service account
+                        foreach($ServiceAccount in $KubeCtlGetServiceAccounts){
+                            if($ServiceAccount -notmatch 'prometheus-' -and $ServiceAccount -match 'prometheus'){
+                                $ServiceAccountCondition += $True
+                            }
+                            else{
+                                $ServiceAccountCondition += $False
+                            }
+                        }
+
+                        # Compare service accounts condition
+                        if($ServiceAccountCondition.Count -gt 1){
+                            if($ServiceAccountCondition -match $True){
+                                Write-Host 'Service observability stack now creates the prometheus role'
+                                cd $ProjectClusterRolePath
+                                $KubeCtlApplyPrometheusRole += kubectl apply -f prometheus-role.yaml
+                                $KubeCtlApplyPrometheusRole += kubectl apply -f prometheus-role-binding.yaml
+                            }
+                            else{
+                                Write-Warning 'Service deployment for prometheus is not exists.'
+                            }
+                        }
+                        elseif($ServiceAccountCondition.Count -eq 1){
+                            if($ServiceAccountCondition -match $True){
+                                Write-Host 'Service observability stack now creates the prometheus role'
+                                cd $ProjectClusterRolePath
+                                $KubeCtlApplyPrometheusRole += kubectl apply -f prometheus-role.yaml
+                                $KubeCtlApplyPrometheusRole += kubectl apply -f prometheus-role-binding.yaml
+                            }
+                            else{
+                                Write-Warning 'Service deployment for prometheus is not exists.'
+                            }
+                        }
+                        else{
+                            Write-Warning 'The result for comparing service accounts is not valid.'
+                        }
+
+                        # Write output
+                        foreach($Output in $KubeCtlApplyPrometheusRole){
+                            Write-Host $Output
+                        }
+
+                    }
+                    else{
+                        Write-Warning 'Project: '+$ProjectPath+'is not exist.'
+                    }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
+
+function PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_MINIKUBE-Deploy_Prometheus_Observability_Stack
+
+.DESCRIPTION
+    Deploying prometheus and grafana to the minicube.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Boolean
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube deployment
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath  $ProjectName
+                    if(Test-Path $ProjectPath){
+                        cd $ProjectPath
+
+                        # Create paths
+                        $ProjectPrometheusConfigPath = Join-Path -Path $ProjectPath -ChildPath 'prometheus_config'
+                        $PrometheusConfigYamlPath    = Join-Path -Path $ProjectPrometheusConfigPath -ChildPath 'prometheus-config.yaml'
+                        $PrometheusConfigMapYamlPath = Join-Path -Path $ProjectPrometheusConfigPath -ChildPath 'prometheus-configmap.yaml'
+                        $PrometheusConfigYamlContent = (
+@'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server-conf
+  labels:
+    app: prometheus
+data:
+  prometheus.yml: |-
+    global:
+      scrape_interval: 15s
+    scrape_configs:
+      - job_name: 'kubernetes-apiservers'
+        kubernetes_sd_configs:
+        - role: endpoints
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+          action: keep
+          regex: default;kubernetes;https
+      - job_name: 'kubernetes-nodes'
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+        - role: node
+        relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - target_label: __address__
+          replacement: kubernetes.default.svc:443
+        - source_labels: [__meta_kubernetes_node_name]
+          regex: (.+)
+          target_label: __metrics_path__
+          replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+      - job_name: 'kubernetes-pods'
+        kubernetes_sd_configs:
+        - role: pod
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+          action: keep
+          regex: true
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+          action: replace
+          target_label: __metrics_path__
+          regex: (.+)
+        - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+          action: replace
+          regex: ([^:]+)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - source_labels: [__meta_kubernetes_namespace]
+          action: replace
+          target_label: kubernetes_namespace
+        - source_labels: [__meta_kubernetes_pod_name]
+          action: replace
+          target_label: kubernetes_pod_name
+
+'@
+                        )
+
+                        $PrometheusConfigMapYamlContent = (
+@'
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-server-conf
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+    scrape_configs:
+      - job_name: 'kubernetes-apiservers'
+        kubernetes_sd_configs:
+          - role: 'endpoints'
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+            action: keep
+            regex: default;kubernetes;https
+      - job_name: 'kubernetes-nodes'
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+          - role: node
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_node_name]
+            regex: (.+)
+            target_label: __metrics_path__
+            replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+      - job_name: 'kubernetes-pods'
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          - target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__meta_kubernetes_pod_name, __meta_kubernetes_namespace]
+            action: keep
+          - source_labels: [__meta_kubernetes_pod_container_name]
+            regex: (.+)
+            target_label: container_name
+          - action: replace
+            target_label: __address__
+            replacement: kubernetes.default.svc:443
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+          - source_labels: [__meta_kubernetes_namespace]
+            action: replace
+            target_label: kubernetes_namespace
+          - source_labels: [__meta_kubernetes_pod_name]
+            action: replace
+            target_label: kubernetes_pod_name
+
+'@
+                        )
+
+                        # Create prometheus config directory
+                        if(Test-Path $ProjectPrometheusConfigPath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusConfigPath -Force -Verbose
+                        }
+
+                        # Create prometheus-config.yaml file
+                        if(Test-Path $PrometheusConfigYamlPath){
+                            $SetContent = Set-Content -Path $PrometheusConfigYamlPath -Value $PrometheusConfigYamlContent -Force -Verbose
+                        }
+                        else{
+                            $NewItem    = New-Item -ItemType File -Path $PrometheusConfigYamlPath -Force -Verbose
+                            $SetContent = Set-Content -Path $PrometheusConfigYamlPath -Value $PrometheusConfigYamlContent -Force -Verbose
+                        }
+
+                        # Create prometheus-configmap.yaml file
+                        if(Test-Path $PrometheusConfigMapYamlPath){
+                            $SetContent = Set-Content -Path $PrometheusConfigMapYamlPath -Value $PrometheusConfigMapYamlContent -Force -Verbose
+                        }
+                        else{
+                            $NewItem    = New-Item -ItemType File -Path $PrometheusConfigMapYamlPath -Force -Verbose
+                            $SetContent = Set-Content -Path $PrometheusConfigMapYamlPath -Value $PrometheusConfigMapYamlContent -Force -Verbose
+                        }
+
+                        $ServiceAccountCondition         = @()
+                        $KubeCtlGetServiceAccounts       = @()
+                        $KubeCtlCreatePrometheusConfig   = @()
+                        $KubeCtlApplyPrometheusConfigMap = @()
+
+                        # Get service account list
+                        $KubeCtlGetServiceAccounts += kubectl get serviceaccounts
+
+                        # Write output
+                        foreach($Output in $KubeCtlGetServiceAccounts){
+                            Write-Host $Output
+                        }
+
+                        # Find current service account
+                        foreach($ServiceAccount in $KubeCtlGetServiceAccounts){
+                            if($ServiceAccount -match 'prometheus-server'){
+                                $ServiceAccountCondition += $True
+                            }
+                            else{
+                                $ServiceAccountCondition += $False
+                            }
+                        }
+
+                        # Compare service accounts condition
+                        if($ServiceAccountCondition.Count -gt 1){
+                            if($ServiceAccountCondition -match $True){
+                                Write-Host 'Service observability stack now creates the prometheus configuration'
+                                cd $ProjectPrometheusConfigPath
+                                $KubeCtlCreatePrometheusConfig += kubectl create -f prometheus-config.yaml
+                                $KubeCtlApplyPrometheusConfigMap += kubectl apply -f prometheus-configmap.yaml
+                            }
+                            else{
+                                Write-Warning 'Service deployment for prometheus-server is not exists.'
+                            }
+                        }
+                        elseif($ServiceAccountCondition.Count -eq 1){
+                            if($ServiceAccountCondition -match $True){
+                                Write-Host 'Service observability stack now creates the prometheus configuration'
+                                cd $ProjectPrometheusConfigPath
+                                $KubeCtlCreatePrometheusConfig += kubectl create -f prometheus-config.yaml
+                                $KubeCtlApplyPrometheusConfigMap += kubectl apply -f prometheus-configmap.yaml
+                            }
+                            else{
+                                Write-Warning 'Service deployment for prometheus-server is not exists.'
+                            }
+                        }
+                        else{
+                            Write-Warning 'The result for comparing service accounts is not valid.'
+                        }
+
+                        # Write output
+                        foreach($Output in $KubeCtlCreatePrometheusConfig){
+                            Write-Host $Output
+                        }
+
+                        # Write output
+                        foreach($Output in $KubeCtlApplyPrometheusConfigMap){
+                            Write-Host $Output
+                        }
+
+                    }
+                    else{
+                        Write-Warning 'Project: '+$ProjectPath+'is not exist.'
+                    }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
+
+
+
+# KUBERNETES OBSERVABILITY STACK GET METRIC DATA
