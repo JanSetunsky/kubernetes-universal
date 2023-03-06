@@ -3182,11 +3182,11 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
                             if($ServiceAccountCondition -match $True){
                                 # Get prometheus-server url address process
                                 $RunspaceName              = 'prometheus-server'
-                                $RunspaceScriptBlock       = {minikube service prometheus-server --url > prometheus/prometheus-server-url.txt}
+                                $RunspaceScriptBlock       = {minikube service prometheus-server --url | Out-File -Encoding utf8 -FilePath prometheus/prometheus-server-url.txt & EXIT}
                                 $RunspaceCommandType       = 'Decode-Command'
                                 $RunspaceProcedureMethod   = 'Test-Path'
                                 $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
-                                $RunspaceProcedureDateTime = (Get-Date).AddSeconds(-10)
+                                $RunspaceProcedureDateTime = Get-Date
                                 $RunspaceWindowStyle       = 'Normal'
                                 $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $RunspaceScriptBlock -CommandType $RunspaceCommandType -ProcedureMethod $RunspaceProcedureMethod -ProcedureInput $RunspaceProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $RunspaceWindowStyle
 
@@ -3454,7 +3454,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                             if($ServiceAccountCondition -match $True){
                                 # Get prometheus-server url address process
                                 $RunspaceName              = 'prometheus-server'
-                                $RunspaceScriptBlock       = {minikube service prometheus-server --url > prometheus-server-url.txt}
+                                $RunspaceScriptBlock       = {$PID;minikube service prometheus-server --url > prometheus/prometheus-server-url.txt & EXIT}
                                 $RunspaceCommandType       = 'Decode-Command'
                                 $RunspaceProcedureMethod   = 'Test-Path'
                                 $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
@@ -3466,7 +3466,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                                     Write-Host 'Service observability stack now creates the prometheus metric log for MEMORY.'
 
                                     # Invoke query
-                                    $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
+                                    $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force -Raw
                                     $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
                                     $PrometheusUrl       = $PrometheusServerUrl[1]
                                     $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"

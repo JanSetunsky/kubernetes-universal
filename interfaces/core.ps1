@@ -3428,7 +3428,7 @@ function Invoke-Runspace_Procedure {
             if($Condition){
                 $EndTime    = ''
                 $Status     = 'Running'
-                $Process    = Start-Process "pwsh.exe" -argumentlist $Arguments -PassThru -Verbose -Verb "runas"
+                $Process    = Start-Process "pwsh.exe" -argumentlist $Arguments 
                 $ProcessPID = $Process.Id
                 $RunspaceId = $GUID
                 $Repeat = 0
@@ -3462,22 +3462,19 @@ function Invoke-Runspace_Procedure {
                             # pass
                         }
                         else{
-                            sleep 2
+                            sleep 1
                         }
                         if($ProcedureMethod -eq 'Test-Path'){
                             if(Test-Path $ProcedureInput){
-                                $ProcedureGci = Get-ChildItem -Path $ProcedureInput -Force
-                                Write-Host $ProcedureGci.LastAccessTime
+                                $ProcedureGetItem = Get-Item $ProcedureInput -Force
+                                Write-Host $ProcedureGetItem.LastAccessTime
                                 Write-Host $ProcedureDateTime
-                                if($ProcedureGci.LastAccessTime -gt $ProcedureDateTime){
-                                    Write-Host 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+                                if($ProcedureGetItem.LastAccessTime -gt $ProcedureDateTime){
                                     $ProcedureCondition = $True
-                                    KILL $RunspaceProcessDetail.ProcessID
                                 }
                                 else{
                                     if($Repeat -gt 5){
                                         $ProcedureCondition = $False
-                                        KILL $RunspaceProcessDetail.ProcessID
                                     }
                                     else{
                                         $RunspaceProcess |iex -ErrorAction SilentlyContinue
@@ -3487,7 +3484,6 @@ function Invoke-Runspace_Procedure {
                             else{
                                 if($Repeat -gt 5){
                                     $ProcedureCondition = $False
-                                    KILL $RunspaceProcessDetail.ProcessID
                                 }
                                 else{
                                     $RunspaceProcess |iex -ErrorAction SilentlyContinue
