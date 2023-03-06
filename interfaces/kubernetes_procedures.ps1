@@ -3,7 +3,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Start_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Start-MiniKube_cluster
+    LOCALHOST_PROCEDURE_MINIKUBE-Start_Local_Cluster
 
 .DESCRIPTION
     First, the status of the cluster is determined, if it is available, and then 
@@ -338,7 +338,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Pause_Local_Cluster {
                     $MiniKubeStatus.ApiServer -eq 'Running' -and
                     $MiniKubeStatus.Config -eq 'Configured'
                 ){
-                    Write-Host 'MiniKube cluster will be shut down.'
+                    Write-Host 'MiniKube cluster is running and will be suspended.'
                     $MiniKubeStop = minikube pause
                 }
                 elseif(
@@ -468,7 +468,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-UnPause_Local_Cluster {
                     $MiniKubeStatus.ApiServer -eq 'Running' -and
                     $MiniKubeStatus.Config -eq 'Configured'
                 ){
-                    Write-Host 'MiniKube cluster will be shut down.'
+                    Write-Host 'MiniKube cluster is already running.'
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended and will be started again.'
                     $MiniKubeStop = minikube unpause
                 }
                 elseif(
@@ -596,6 +605,17 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Delete_Local_Cluster {
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
+                    Write-Host 'MiniKube cluster will be deleted.'
+                    $MiniKubeDelete = minikube delete
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
                     $MiniKubeStatus.Host -eq 'Stopped' -and
                     $MiniKubeStatus.KubeLet -eq 'Stopped' -and
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
@@ -716,6 +736,17 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Delete_All_Clusters {
                 ){
                     Write-Host 'MiniKube cluster will be shut down.'
                     $MiniKubeStop = minikube stop
+                    Write-Host 'MiniKube all clusters will be deleted.'
+                    $MiniKubeDelete = minikube delete --all
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
                     Write-Host 'MiniKube all clusters will be deleted.'
                     $MiniKubeDelete = minikube delete --all
                 }
@@ -882,6 +913,9 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
                     elseif($MiniKubeApiServer -match 'Running'){
                         $MiniKubeApiServer = 'Running'
                     }
+                    elseif($MiniKubeApiServer -match 'Running'){
+                        $MiniKubeApiServer = 'Paused'
+                    }
                     else{
                         $MiniKubeApiServer = 'Uknown'
                     }
@@ -913,6 +947,24 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
                             ApiServer  = $MiniKubeApiServer
                             Config     = $MiniKubeKubeConfig
                             IsRunning  = $True
+                        }
+                    }
+                    elseif(
+                        $MiniKubeType -eq 'Control Plane' -and
+                        $MiniKubeHost -eq 'Running' -and
+                        $MiniKubeKubeLet -eq 'Stopped' -and
+                        $MiniKubeApiServer -eq 'Paused' -and
+                        $MiniKubeKubeConfig -eq 'Stopped'        
+                    ){
+                        Write-Host 'MiniKube cluster is suspended.'
+                        # Create Output
+                        $MiniKubeOutput = [PSCustomObject]@{
+                            Type       = $MiniKubeType
+                            Host       = $MiniKubeHost
+                            KubeLet    = $MiniKubeKubeLet
+                            ApiServer  = $MiniKubeApiServer
+                            Config     = $MiniKubeKubeConfig
+                            IsRunning  = $False
                         }
                     }
                     elseif(
@@ -1104,6 +1156,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Nginx_Image {
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
                     $MiniKubeStatus.Host -eq 'Stopped' -and
                     $MiniKubeStatus.KubeLet -eq 'Stopped' -and
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
@@ -1260,6 +1321,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Update_Nginx_Image {
                     else{
                         Write-Warning 'Project: '+$ProjectPath+'is not exist.'
                     }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
@@ -1421,6 +1491,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Delete_Nginx_Image {
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
                     $MiniKubeStatus.Host -eq 'Stopped' -and
                     $MiniKubeStatus.KubeLet -eq 'Stopped' -and
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
@@ -1570,6 +1649,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Nginx_Service {
                     else{
                 
                     }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
@@ -1735,6 +1823,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
                     $MiniKubeStatus.Host -eq 'Stopped' -and
                     $MiniKubeStatus.KubeLet -eq 'Stopped' -and
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
@@ -1891,6 +1988,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Grafana {
                     else{
                         Write-Warning 'Project: '+$ProjectPath+'is not exist.'
                     }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
@@ -2051,6 +2157,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard {
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
                     $MiniKubeStatus.Host -eq 'Stopped' -and
                     $MiniKubeStatus.KubeLet -eq 'Stopped' -and
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
@@ -2205,6 +2320,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Monitoring_Standalone {
                     else{
                         Write-Warning 'Project: '+$ProjectPath+'is not exist.'
                     }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
@@ -2376,6 +2500,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Service_Account_Prometheus {
                     else{
                         Write-Warning 'Project: '+$ProjectPath+'is not exist.'
                     }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
@@ -2633,6 +2766,15 @@ roleRef:
                     else{
                         Write-Warning 'Project: '+$ProjectPath+'is not exist.'
                     }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
@@ -3004,6 +3146,15 @@ data:
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
                     $MiniKubeStatus.Host -eq 'Stopped' -and
                     $MiniKubeStatus.KubeLet -eq 'Stopped' -and
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
@@ -3279,6 +3430,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
                     $MiniKubeStatus.Host -eq 'Stopped' -and
                     $MiniKubeStatus.KubeLet -eq 'Stopped' -and
                     $MiniKubeStatus.ApiServer -eq 'Stopped' -and
@@ -3548,6 +3708,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                     else{
                         Write-Warning 'Project: '+$ProjectPath+'is not exist.'
                     }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
