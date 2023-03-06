@@ -1038,10 +1038,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Nginx_Image {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Deploy-MiniKube_NGINX_DEMO
+    LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Nginx_Image
 
 .DESCRIPTION
-    This function deploys NGINX DEMO to kubernetes.
+    This function deploys NGINX IMAGE to kubernetes.
     External data from the configuration file is used for deployment.
 
 .PARAMETER OperatingSystem
@@ -1210,10 +1210,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Update_Nginx_Image {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Deploy-MiniKube_NGINX_DEMO
+    LOCALHOST_PROCEDURE_MINIKUBE-Update_Nginx_Image
 
 .DESCRIPTION
-    This function deploys NGINX DEMO to kubernetes.
+    This function updated NGINX IMAGE to kubernetes.
     External data from the configuration file is used for deployment.
 
 .PARAMETER OperatingSystem
@@ -1378,10 +1378,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Delete_Nginx_Image {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Delete-MiniKube_NGINX_DEMO
+    LOCALHOST_PROCEDURE_MINIKUBE-Delete_Nginx_Image
 
 .DESCRIPTION
-    After deploying NGINX DEMO, this function will uninstall the nginx demo deployment including the service.
+    After deploying NGINX IMAGE, this function will uninstall the nginx demo deployment including the service.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -1545,10 +1545,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Nginx_Service {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Get-Services_MiniKube_NGINX_DEMO
+    LOCALHOST_PROCEDURE_MINIKUBE-Get_Nginx_Service
 
 .DESCRIPTION
-    After deploying NGINX DEMO to kubernetes, this function checks if the nginx demo deployment and service are available.
+    After deploying NGINX IMAGE to kubernetes, this function checks if the nginx image deployment and service are available.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -1709,7 +1709,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Helm-Install_Prometheus
+    LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Prometheus
 
 .DESCRIPTION
     Installing the Prometheus dependency using the Helm installer package.
@@ -1877,7 +1877,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Grafana {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Helm-Install_Prometheus
+    LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Grafana
 
 .DESCRIPTION
     Installing the Grafana dependency using the Helm installer package.
@@ -2045,10 +2045,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Helm-Deploy_Prometheus_And_Grafana
+    LOCALHOST_PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard
 
 .DESCRIPTION
-    Deploying prometheus and grafana to the minicube.
+    Creating a kubernetes dashboard according to external data sources from the configuration file.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -2211,10 +2211,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Monitoring_Standalone {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Helm-Deploy_Prometheus_And_Grafana
+    LOCALHOST_PROCEDURE_MINIKUBE-Create_Monitoring_Standalone
 
 .DESCRIPTION
-    Deploying prometheus and grafana to the minicube.
+    Creating a kubernetes monitoring standalone according to external data sources from the configuration file.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -2377,10 +2377,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Service_Account_Prometheus {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_MINIKUBE-Deploy_Prometheus_Observability_Stack
+    LOCALHOST_PROCEDURE_MINIKUBE-Create_Service_Account_Prometheus
 
 .DESCRIPTION
-    Deploying prometheus and grafana to the minicube.
+    Creating a service account named prometheus that is deployed to kubernetes to communicate with kubernetes.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -2557,10 +2557,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Cluster_Prometheus_Role {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_MINIKUBE-Deploy_Prometheus_Observability_Stack
+    LOCALHOST_PROCEDURE_MINIKUBE-Create_Cluster_Prometheus_Role
 
 .DESCRIPTION
-    Deploying prometheus and grafana to the minicube.
+    Creating a cluster prometheus role, and saving the role in the project folder.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -2823,10 +2823,11 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_MINIKUBE-Deploy_Prometheus_Observability_Stack
+    LOCALHOST_PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration
 
 .DESCRIPTION
-    Deploying prometheus and grafana to the minicube.
+    Creation of a configuration file and configuration map for prometheus server, 
+    which are saved in the project folder and deployed to kubernetes.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -3203,10 +3204,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_MINIKUBE-Deploy_Prometheus_Observability_Stack
+    LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric
 
 .DESCRIPTION
-    Deploying prometheus and grafana to the minicube.
+    Get the promeus metrics, which will save the logs in the folder with the project.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -3484,10 +3485,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_MINIKUBE-Deploy_Prometheus_Observability_Stack
+    LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric
 
 .DESCRIPTION
-    Deploying prometheus and grafana to the minicube.
+    Get the promeus metrics, which will save the logs in the folder with the project.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
