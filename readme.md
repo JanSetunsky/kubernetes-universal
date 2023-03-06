@@ -34,21 +34,33 @@ Packages represent application names and their installation scheme. If you fill 
 
 There are two installation options, which can be found in the setup folder. There is either `.setup/install_environment.ps1` or `.setup/fullautomation.ps1`.
 
-After creating the environment, we can start the installation. If you use the configuration file that is included in the `.Environment/...` folder, the environment will be installed on the local disk and your computer will be ready to run kubernetes using the MiniKube application that I chose for testing.
+If we choose `.setup/install_environment.ps1`, the basic dependencies will be installed and then it is possible to manually test the functions found in all `.libraries/kubernetes/*`. You just need to invoke these functions with the `pwsh 'file path' method, for example.
+
+If we choose `.setup/ifullautomation.ps1`, all dependencies will be installed, prometheus and grafana will be deployed, and the nginx web server will be deployed.
 
 Part of the installation is the creation of the runspace folder, where the projects folder is created automatically and where your project is created under the name ProjectName, which is part of the configuration file.
 
-A new `./config.json` file will be created with your project, where the data between the configuration file from `.environment/config.json` and the database files will be validated.
-
-This is a test version and always before starting MiniKube, it is necessary to run the file `.install.ps1` which initializes and updates the environment so that a file such as `.start.ps1` can be run
+A new `.runspace/projects/project_name/config.json` file will be created with your project to store the project data, including the necessary dependency data. Log files and all current dependencies that are written to local disk will also be stored here.
 
 ### Functions
 
-The `.functions.ps1` file contains all the functions that are part of the environment installation automation. All features have a brief SYNOPSIS,DESCRIPTION,PARAMETER,EXAMPLE,INPUTS and OUTPUTS.
+Functions that are part of kubernetes-universal are located centrally in folder`.interfaces/*`.
+The main functions for creating and controlling the environment are located in the file `.interfaces/core.ps1`. Functions include SYNOPSIS, DESCRIPTION, PARAMETER, EXAMPLE, INPUTS, and OUTPUTS.
+
+Here we find files with the names:
+`.interfaces/installation_definition.ps1`
+`.interfaces/installation_verification.ps1`
+These script blocks are used for routine data definition, file paths and installation verification.
+They are separated in this way to shorten the routine installation code, since the same processes are repeated over and over again.
+
+Here we find files with the names:
+`.interfaces/kubernetes_verification.ps1`
+`.interfaces/kubernetes_definition.ps1`
+These files represent the routine definition and verification of the built project/project environment in the game `.runspace/project_name/config.json` and are no longer installed.
 
 ### Procedures
 
-The `.environment/config.json` file includes a section named ListOfProcedures where the given input syntax must be followed and where the DevOps CI/CD operation automation procedures are specified.
+The `.interfaces/kubernetes_procedures.ps1` file includes a section named ListOfProcedures where the given input syntax must be followed and where the DevOps CI/CD operation automation procedures are specified.
 
 The `.environment/config.json` file contains a section called ListOfProcedures where the given input syntax must be followed and where the procedures for automating the DevOps CI/CD operation are specified.
 
