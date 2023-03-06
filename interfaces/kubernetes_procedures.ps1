@@ -2753,7 +2753,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration {
 
                         # Create paths
                         $ProjectPrometheusPath       = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
-                        $ProjectPrometheusConfigPath = Join-Path -Path $ProjectPrometheusPath -ChildPath 'prometheus_config'
+                        $ProjectPrometheusConfigPath = Join-Path -Path $ProjectPrometheusPath -ChildPath 'config'
                         $PrometheusConfigYamlPath    = Join-Path -Path $ProjectPrometheusConfigPath -ChildPath 'prometheus-config.yaml'
                         $PrometheusConfigMapYamlPath = Join-Path -Path $ProjectPrometheusConfigPath -ChildPath 'prometheus-configmap.yaml'
                         $PrometheusConfigYamlContent = (
@@ -3050,7 +3050,7 @@ data:
 
 
 # KUBERNETES OBSERVABILITY STACK GET METRIC DATA
-function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
+function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -3182,11 +3182,11 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                             if($ServiceAccountCondition -match $True){
                                 # Get prometheus-server url address process
                                 $RunspaceName              = 'prometheus-server'
-                                $RunspaceScriptBlock       = {minikube service prometheus-server --url > prometheus-server-url.txt}
+                                $RunspaceScriptBlock       = {minikube service prometheus-server --url > prometheus/prometheus-server-url.txt}
                                 $RunspaceCommandType       = 'Decode-Command'
                                 $RunspaceProcedureMethod   = 'Test-Path'
                                 $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
-                                $RunspaceProcedureDateTime = Get-Date
+                                $RunspaceProcedureDateTime = (Get-Date).AddSeconds(-10)
                                 $RunspaceWindowStyle       = 'Normal'
                                 $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $RunspaceScriptBlock -CommandType $RunspaceCommandType -ProcedureMethod $RunspaceProcedureMethod -ProcedureInput $RunspaceProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $RunspaceWindowStyle
 
@@ -3195,7 +3195,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
 
                                     # Invoke query
                                     $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
-                                    $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
+                                    $PrometheusQuery     = 'sum(rate(container_cpu_usage_seconds_total{container_name!="POD", container_name!="", image!="",namespace!="kube-system"}[1m])) by (namespace, pod, container)'
                                     $PrometheusUrl       = $PrometheusServerUrl[1]
                                     $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
                                     $PrometheusOutput    = Invoke-RestMethod -Method Get -Uri $PrometheusUri
@@ -3231,7 +3231,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                                 $RunspaceCommandType       = 'Decode-Command'
                                 $RunspaceProcedureMethod   = 'Test-Path'
                                 $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
-                                $RunspaceProcedureDateTime = Get-Date
+                                $RunspaceProcedureDateTime = (Get-Date).AddSeconds(-10)
                                 $RunspaceWindowStyle       = 'Normal'
                                 $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $RunspaceScriptBlock -CommandType $RunspaceCommandType -ProcedureMethod $RunspaceProcedureMethod -ProcedureInput $RunspaceProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $RunspaceWindowStyle
 
@@ -3240,7 +3240,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
 
                                     # Invoke query
                                     $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
-                                    $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
+                                    $PrometheusQuery     = 'sum(rate(container_cpu_usage_seconds_total{container_name!="POD", container_name!="", image!="",namespace!="kube-system"}[1m])) by (namespace, pod, container)'
                                     $PrometheusUrl       = $PrometheusServerUrl[1]
                                     $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
                                     $PrometheusOutput    = Invoke-RestMethod -Method Get -Uri $PrometheusUri
@@ -3322,7 +3322,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
     }
 }
 
-function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
+function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -3381,7 +3381,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
 
                 # MiniKube cluster availability verification
                 $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
-            
+                
                 # MiniKube deployment
                 if(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
@@ -3390,18 +3390,18 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
                     $MiniKubeStatus.ApiServer -eq 'Running' -and
                     $MiniKubeStatus.Config -eq 'Configured'
                 ){
-                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath  $ProjectName
+                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath $ProjectName
                     if(Test-Path $ProjectPath){
                         cd $ProjectPath
-
+                        
                         # Get ticks
                         [string]$Ticks = (Get-Date).Ticks
 
                         # Create paths
                         $ProjectPrometheusPath           = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
                         $ProjectPrometheusMetricsPath    = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
-                        $ProjectPrometheusMetricsCpuPath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath 'cpu'
-                        $PrometheusMetricsCpuItemPath    = Join-Path -Path $ProjectPrometheusMetricsCpuPath -ChildPath ($Ticks+'.json')
+                        $ProjectPrometheusMetricsMemoryPath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath 'Memory'
+                        $PrometheusMetricsMemoryItemPath    = Join-Path -Path $ProjectPrometheusMetricsMemoryPath -ChildPath ($Ticks+'.json')
                         $ProjectPrometheusServerUrlPath  = Join-Path -Path $ProjectPrometheusPath -ChildPath 'prometheus-server-url.txt'
 
                         # Create prometheus directory
@@ -3420,16 +3420,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
                             $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsPath -Force -Verbose
                         }
 
-                        # Create prometheus cpu directory
-                        if(Test-Path $ProjectPrometheusMetricsCpuPath){
+                        # Create prometheus Memory directory
+                        if(Test-Path $ProjectPrometheusMetricsMemoryPath){
                             # pass
                         }
                         else{
-                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsCpuPath -Force -Verbose
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsMemoryPath -Force -Verbose
                         }
-
-                        $ServiceAccountCondition         = @()
-                        $KubeCtlGetServiceAccounts       = @()
+                        
+                        $ServiceAccountCondition   = @()
+                        $KubeCtlGetServiceAccounts = @()
 
                         # Get service account list
                         $KubeCtlGetServiceAccounts += kubectl get serviceaccounts
@@ -3460,14 +3460,14 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
                                 $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
                                 $RunspaceProcedureDateTime = Get-Date
                                 $RunspaceWindowStyle       = 'Normal'
-                                $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $Name -ScriptBlock $ScriptBlock -CommandType $CommandType -ProcedureMethod $ProcedureMethod -ProcedureInput $ProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $WindowStyle
+                                $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $RunspaceScriptBlock -CommandType $RunspaceCommandType -ProcedureMethod $RunspaceProcedureMethod -ProcedureInput $RunspaceProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $RunspaceWindowStyle
 
                                 if($InvokeRunspaceProcedure){
-                                    Write-Host 'Service observability stack now creates the prometheus metric log for CPU.'
+                                    Write-Host 'Service observability stack now creates the prometheus metric log for MEMORY.'
 
                                     # Invoke query
                                     $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
-                                    $PrometheusQuery     = 'sum(rate(container_cpu_usage_seconds_total{container_name!="POD", container_name!="", image!="",namespace!="kube-system"}[1m])) by (namespace, pod, container)'
+                                    $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
                                     $PrometheusUrl       = $PrometheusServerUrl[1]
                                     $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
                                     $PrometheusOutput    = Invoke-RestMethod -Method Get -Uri $PrometheusUri
@@ -3478,13 +3478,13 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
                                         Write-Host $Output
                                     }
 
-                                    # Create cpu file
-                                    if(Test-Path $PrometheusMetricsCpuItemPath){
-                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                    # Create Memory file
+                                    if(Test-Path $PrometheusMetricsMemoryItemPath){
+                                        $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
                                     }
                                     else{
-                                        $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsCpuItemPath -Force -Verbose
-                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                        $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsMemoryItemPath -Force -Verbose
+                                        $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
                                     }
                                 }
                                 else{
@@ -3505,14 +3505,14 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
                                 $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
                                 $RunspaceProcedureDateTime = Get-Date
                                 $RunspaceWindowStyle       = 'Normal'
-                                $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $Name -ScriptBlock $ScriptBlock -CommandType $CommandType -ProcedureMethod $ProcedureMethod -ProcedureInput $ProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $WindowStyle
+                                $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $RunspaceScriptBlock -CommandType $RunspaceCommandType -ProcedureMethod $RunspaceProcedureMethod -ProcedureInput $RunspaceProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $RunspaceWindowStyle
 
                                 if($InvokeRunspaceProcedure){
-                                    Write-Host 'Service observability stack now creates the prometheus metric log for CPU.'
+                                    Write-Host 'Service observability stack now creates the prometheus metric log for MEMORY.'
 
                                     # Invoke query
                                     $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
-                                    $PrometheusQuery     = 'sum(rate(container_cpu_usage_seconds_total{container_name!="POD", container_name!="", image!="",namespace!="kube-system"}[1m])) by (namespace, pod, container)'
+                                    $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
                                     $PrometheusUrl       = $PrometheusServerUrl[1]
                                     $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
                                     $PrometheusOutput    = Invoke-RestMethod -Method Get -Uri $PrometheusUri
@@ -3523,13 +3523,13 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
                                         Write-Host $Output
                                     }
 
-                                    # Create cpu file
-                                    if(Test-Path $PrometheusMetricsCpuItemPath){
-                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                    # Create Memory file
+                                    if(Test-Path $PrometheusMetricsMemoryItemPath){
+                                        $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
                                     }
                                     else{
-                                        $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsCpuItemPath -Force -Verbose
-                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                        $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsMemoryItemPath -Force -Verbose
+                                        $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
                                     }
                                 }
                                 else{
@@ -3593,3 +3593,4 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
         return $Condition
     }
 }
+
