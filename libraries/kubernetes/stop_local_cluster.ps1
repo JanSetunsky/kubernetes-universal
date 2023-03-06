@@ -1,6 +1,6 @@
 #region >> [ PROJECT PROCEDURES ]
 $PROJECT_PROCEDURES_SC = {
-    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('MINIKUBE_STOP_LOCAL_CLUSTER') -MeasureDuration $True -ErrorAction Stop
+    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('LOCALHOST_MINIKUBE_STOP_LOCAL_CLUSTER') -MeasureDuration $True -ErrorAction Stop
 }
 #endregion [ PROJECT PROCEDURES ]
 

@@ -20,30 +20,30 @@
   "InstallingPackages": "True",
   "ListOfProcedures": [
     {
-      "MINIKUBE_START_LOCAL_CLUSTER": [
+      "LOCALHOST_MINIKUBE_START_LOCAL_CLUSTER": [
         {
-          "Name": "PROCEDURE_MINIKUBE-Start_Local_Cluster",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Start_Local_Cluster",
           "MD": false,
           "Data":[]
         }
       ],
-      "MINIKUBE_STOP_LOCAL_CLUSTER": [
+      "LOCALHOST_MINIKUBE_STOP_LOCAL_CLUSTER": [
         {
-          "Name": "PROCEDURE_MINIKUBE-Stop_Local_Cluster",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Stop_Local_Cluster",
           "MD": false,
           "Data":[]
         }
       ],
-      "MINIKUBE_DELETE_LOCAL_CLUSTER": [
+      "LOCALHOST_MINIKUBE_DELETE_LOCAL_CLUSTER": [
         {
-          "Name": "PROCEDURE_MINIKUBE-Delete_Local_Cluster",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Delete_Local_Cluster",
           "MD": false,
           "Data":[]
         }
       ],
-      "MINIKUBE_DEPLOY_IMAGE": [
+      "LOCALHOST_MINIKUBE_DEPLOY_IMAGE": [
         {
-          "Name": "PROCEDURE_MINIKUBE-Deploy_Nginx_Image",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Nginx_Image",
           "MD": false,
           "Data":[{
             "DeploymentName": "nginx-demo",
@@ -53,16 +53,16 @@
           }]
         },
         {
-          "Name": "PROCEDURE_MINIKUBE-Get_Nginx_Service",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Nginx_Service",
           "MD": false,
           "Data":[{
             "DeploymentName": "nginx-demo"
           }]
         }
       ],
-      "MINIKUBE_UPDATE_IMAGE": [
+      "LOCALHOST_MINIKUBE_UPDATE_IMAGE": [
         {
-          "Name": "PROCEDURE_MINIKUBE-Update_Nginx_Image",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Update_Nginx_Image",
           "MD": false,
           "Data":[{
             "DeploymentName": "nginx-demo",
@@ -70,25 +70,25 @@
           }]
         },
         {
-          "Name": "PROCEDURE_MINIKUBE-Get_Nginx_Service",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Nginx_Service",
           "MD": false,
           "Data":[{
             "DeploymentName": "nginx-demo"
           }]
         }
       ],
-      "MINIKUBE_DELETE_IMAGE": [
+      "LOCALHOST_MINIKUBE_DELETE_IMAGE": [
         {
-          "Name": "PROCEDURE_MINIKUBE-Delete_Nginx_Image",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Delete_Nginx_Image",
           "MD": false,
           "Data":[{
             "DeploymentName": "nginx-demo"
           }]
         }
       ],
-      "MINIKUBE_OBSERVABILITY_STACK_Helm_Install_Prometheus_Grafana": [
+      "LOCALHOST_MINIKUBE_OBSERVABILITY_STACK_Helm_Install_Prometheus_Grafana": [
         {
-          "Name": "PROCEDURE_MINIKUBE-Helm_Install_Prometheus",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Prometheus",
           "MD": false,
           "Data":[{
             "StackName": "prometheus",
@@ -97,7 +97,7 @@
           }]
         },
         {
-          "Name": "PROCEDURE_MINIKUBE-Helm_Install_Grafana",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Grafana",
           "MD": false,
           "Data":[{
             "StackName": "grafana",
@@ -106,31 +106,53 @@
           }]
         },
         {
-          "Name": "PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard",
           "MD": false,
           "Data":[{
             "KubernetesDashboard": "https://raw.githubusercontent.com/kubernetes/kops/master/addons/kubernetes-dashboard/v1.8.3.yaml"
           }]
         },
         {
-          "Name": "PROCEDURE_MINIKUBE-Create_Monitoring_Standalone",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Create_Monitoring_Standalone",
           "MD": false,
           "Data":[{
             "MonitoringStandalone": "https://raw.githubusercontent.com/kubernetes/kops/master/addons/monitoring-standalone/v1.8.3.yaml"
           }]
         },
         {
-          "Name": "PROCEDURE_MINIKUBE-Create_Service_Prometheus",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Create_Service_Prometheus",
           "MD": false,
           "Data":[]
         },
         {
-          "Name": "PROCEDURE_MINIKUBE-Create_Cluster_Prometheus_Role",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Create_Cluster_Prometheus_Role",
           "MD": false,
           "Data":[]
         },
         {
-          "Name": "PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration",
+          "MD": false,
+          "Data":[]
+        },
+        {
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric",
+          "MD": false,
+          "Data":[]
+        },
+        {
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric",
+          "MD": false,
+          "Data":[]
+        }
+      ],
+      "LOCALHOST_MINIKUBE_OBSERVABILITY_STACK_Get_Prometheus_Metrics": [
+        {
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric",
+          "MD": false,
+          "Data":[]
+        },
+        {
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric",
           "MD": false,
           "Data":[]
         }

@@ -1,6 +1,6 @@
 #region >> [ PROJECT PROCEDURES ]
 $PROJECT_PROCEDURES_SC = {
-    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('MINIKUBE_UPDATE_IMAGE') -MeasureDuration $True -ErrorAction Stop
+    $InvokeProcedure = Invoke-Project_Procedures -OperatingSystem $OS_TYPE -BuildData $BuildData -Procedures ('LOCALHOST_MINIKUBE_UPDATE_IMAGE') -MeasureDuration $True -ErrorAction Stop
 }
 #endregion [ PROJECT PROCEDURES ]
 

@@ -1,5 +1,5 @@
 # KUBERNETES CLUSTER MANAGEMENT
-function PROCEDURE_MINIKUBE-Start_Local_Cluster {
+function LOCALHOST_PROCEDURE_MINIKUBE-Start_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -58,7 +58,7 @@ function PROCEDURE_MINIKUBE-Start_Local_Cluster {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
 
                 # MiniKube start
                 if($MiniKubeStatus -eq 'is-not-exist'){
@@ -77,7 +77,16 @@ function PROCEDURE_MINIKUBE-Start_Local_Cluster {
                     $MiniKubeStatus.ApiServer -eq 'Running' -and
                     $MiniKubeStatus.Config -eq 'Configured'
                 ){
-                    Write-Host 'MiniKube cluster cannot be started.'
+                    Write-Host 'MiniKube cluster is already running.'
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
@@ -130,7 +139,7 @@ function PROCEDURE_MINIKUBE-Start_Local_Cluster {
     }
 }
 
-function PROCEDURE_MINIKUBE-Stop_Local_Cluster {
+function LOCALHOST_PROCEDURE_MINIKUBE-Stop_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -189,7 +198,7 @@ function PROCEDURE_MINIKUBE-Stop_Local_Cluster {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube stop
                 if(
@@ -201,6 +210,15 @@ function PROCEDURE_MINIKUBE-Stop_Local_Cluster {
                 ){
                     Write-Host 'MiniKube cluster will be shut down.'
                     $MiniKubeStop = minikube stop
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
                 }
                 elseif(
                     $MiniKubeStatus.Type -eq 'Control Plane' -and
@@ -251,7 +269,7 @@ function PROCEDURE_MINIKUBE-Stop_Local_Cluster {
     }
 }
 
-function PROCEDURE_MINIKUBE-Delete_Local_Cluster {
+function LOCALHOST_PROCEDURE_MINIKUBE-Pause_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -310,7 +328,258 @@ function PROCEDURE_MINIKUBE-Delete_Local_Cluster {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube stop
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    Write-Host 'MiniKube cluster will be shut down.'
+                    $MiniKubeStop = minikube pause
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                # Write output
+                foreach($Output in $MiniKubeStop){
+                    Write-Host $Output
+                }
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
+
+function LOCALHOST_PROCEDURE_MINIKUBE-UnPause_Local_Cluster {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_Stop-MiniKube_cluster
+
+.DESCRIPTION
+    First, the status of the cluster is determined, whether it is available, and then 
+    the termination of the cluster itself is triggered, otherwise the cluster is shut down.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Success or Failed
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube stop
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    Write-Host 'MiniKube cluster will be shut down.'
+                    $MiniKubeStop = minikube unpause
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                # Write output
+                foreach($Output in $MiniKubeStop){
+                    Write-Host $Output
+                }
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
+
+function LOCALHOST_PROCEDURE_MINIKUBE-Delete_Local_Cluster {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_Stop-MiniKube_cluster
+
+.DESCRIPTION
+    First, the status of the cluster is determined, whether it is available, and then 
+    the termination of the cluster itself is triggered, otherwise the cluster is shut down.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Success or Failed
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube stop
                 if(
@@ -376,7 +645,132 @@ function PROCEDURE_MINIKUBE-Delete_Local_Cluster {
     }
 }
 
-function PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
+function LOCALHOST_PROCEDURE_MINIKUBE-Delete_All_Clusters {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_Stop-MiniKube_cluster
+
+.DESCRIPTION
+    First, the status of the cluster is determined, whether it is available, and then 
+    the termination of the cluster itself is triggered, otherwise the cluster is shut down.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Success or Failed
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube stop
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    Write-Host 'MiniKube cluster will be shut down.'
+                    $MiniKubeStop = minikube stop
+                    Write-Host 'MiniKube all clusters will be deleted.'
+                    $MiniKubeDelete = minikube delete --all
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                    Write-Host 'MiniKube all clusters will be deleted.'
+                    $MiniKubeDelete = minikube delete --all
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                # Write output
+                foreach($Output in $MiniKubeStop){
+                    Write-Host $Output
+                }
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
+
+function LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -590,7 +984,7 @@ function PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
 
 
 # KUBERNETES NGINX WEB SERVER
-function PROCEDURE_MINIKUBE-Deploy_Nginx_Image {
+function LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Nginx_Image {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -649,7 +1043,7 @@ function PROCEDURE_MINIKUBE-Deploy_Nginx_Image {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -753,7 +1147,7 @@ function PROCEDURE_MINIKUBE-Deploy_Nginx_Image {
     }
 }
 
-function PROCEDURE_MINIKUBE-Update_Nginx_Image {
+function LOCALHOST_PROCEDURE_MINIKUBE-Update_Nginx_Image {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -812,7 +1206,7 @@ function PROCEDURE_MINIKUBE-Update_Nginx_Image {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -912,7 +1306,7 @@ function PROCEDURE_MINIKUBE-Update_Nginx_Image {
     }
 }
 
-function PROCEDURE_MINIKUBE-Delete_Nginx_Image {
+function LOCALHOST_PROCEDURE_MINIKUBE-Delete_Nginx_Image {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -970,7 +1364,7 @@ function PROCEDURE_MINIKUBE-Delete_Nginx_Image {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1070,7 +1464,7 @@ function PROCEDURE_MINIKUBE-Delete_Nginx_Image {
     }
 }
 
-function PROCEDURE_MINIKUBE-Get_Nginx_Service {
+function LOCALHOST_PROCEDURE_MINIKUBE-Get_Nginx_Service {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1128,7 +1522,7 @@ function PROCEDURE_MINIKUBE-Get_Nginx_Service {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1225,7 +1619,7 @@ function PROCEDURE_MINIKUBE-Get_Nginx_Service {
 
 
 # KUBERNETES OBSERVABILITY STACK INSTALLATION
-function PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
+function LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1283,7 +1677,7 @@ function PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $null -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $null -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1384,7 +1778,7 @@ function PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
     }
 }
 
-function PROCEDURE_MINIKUBE-Helm_Install_Grafana {
+function LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Grafana {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1442,7 +1836,7 @@ function PROCEDURE_MINIKUBE-Helm_Install_Grafana {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1543,7 +1937,7 @@ function PROCEDURE_MINIKUBE-Helm_Install_Grafana {
     }
 }
 
-function PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard {
+function LOCALHOST_PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1601,7 +1995,7 @@ function PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1700,7 +2094,7 @@ function PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard {
     }
 }
 
-function PROCEDURE_MINIKUBE-Create_Monitoring_Standalone {
+function LOCALHOST_PROCEDURE_MINIKUBE-Create_Monitoring_Standalone {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1758,7 +2152,7 @@ function PROCEDURE_MINIKUBE-Create_Monitoring_Standalone {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -1857,7 +2251,7 @@ function PROCEDURE_MINIKUBE-Create_Monitoring_Standalone {
     }
 }
 
-function PROCEDURE_MINIKUBE-Create_Service_Account_Prometheus {
+function LOCALHOST_PROCEDURE_MINIKUBE-Create_Service_Account_Prometheus {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1915,7 +2309,7 @@ function PROCEDURE_MINIKUBE-Create_Service_Account_Prometheus {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -2028,7 +2422,7 @@ function PROCEDURE_MINIKUBE-Create_Service_Account_Prometheus {
     }
 }
 
-function PROCEDURE_MINIKUBE-Create_Cluster_Prometheus_Role {
+function LOCALHOST_PROCEDURE_MINIKUBE-Create_Cluster_Prometheus_Role {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -2086,7 +2480,7 @@ function PROCEDURE_MINIKUBE-Create_Cluster_Prometheus_Role {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -2101,7 +2495,8 @@ function PROCEDURE_MINIKUBE-Create_Cluster_Prometheus_Role {
                         cd $ProjectPath
 
                         # Create paths
-                        $ProjectClusterRolePath        = Join-Path -Path $ProjectPath -ChildPath 'cluster_role'
+                        $ProjectPrometheusPath         = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
+                        $ProjectClusterRolePath        = Join-Path -Path $ProjectPrometheusPath -ChildPath 'cluster_role'
                         $PrometheusRoleYamlPath        = Join-Path -Path $ProjectClusterRolePath -ChildPath 'prometheus-role.yaml'
                         $PrometheusRoleBindingYamlPath = Join-Path -Path $ProjectClusterRolePath -ChildPath 'prometheus-role-binding.yaml'
                         $PrometheusRoleYamlContent = (
@@ -2145,6 +2540,14 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 "@
                         )
+
+                        # Create prometheus directory
+                        if(Test-Path $ProjectPrometheusPath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusPath -Force -Verbose
+                        }
 
                         # Create cluster role directory
                         if(Test-Path $ProjectClusterRolePath){
@@ -2276,7 +2679,7 @@ roleRef:
     }
 }
 
-function PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration {
+function LOCALHOST_PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -2334,7 +2737,7 @@ function PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration {
                 $Condition = $True
 
                 # MiniKube cluster availability verification
-                $MiniKubeStatus = PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
             
                 # MiniKube deployment
                 if(
@@ -2349,7 +2752,8 @@ function PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration {
                         cd $ProjectPath
 
                         # Create paths
-                        $ProjectPrometheusConfigPath = Join-Path -Path $ProjectPath -ChildPath 'prometheus_config'
+                        $ProjectPrometheusPath       = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
+                        $ProjectPrometheusConfigPath = Join-Path -Path $ProjectPrometheusPath -ChildPath 'prometheus_config'
                         $PrometheusConfigYamlPath    = Join-Path -Path $ProjectPrometheusConfigPath -ChildPath 'prometheus-config.yaml'
                         $PrometheusConfigMapYamlPath = Join-Path -Path $ProjectPrometheusConfigPath -ChildPath 'prometheus-configmap.yaml'
                         $PrometheusConfigYamlContent = (
@@ -2499,6 +2903,14 @@ data:
 '@
                         )
 
+                        # Create prometheus directory
+                        if(Test-Path $ProjectPrometheusPath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusPath -Force -Verbose
+                        }
+
                         # Create prometheus config directory
                         if(Test-Path $ProjectPrometheusConfigPath){
                             # pass
@@ -2551,7 +2963,7 @@ data:
                         # Compare service accounts condition
                         if($ServiceAccountCondition.Count -gt 1){
                             if($ServiceAccountCondition -match $True){
-                                Write-Host 'Service observability stack now creates the prometheus configuration'
+                                Write-Host 'Service observability stack now creates the prometheus configuration.'
                                 cd $ProjectPrometheusConfigPath
                                 $KubeCtlCreatePrometheusConfig += kubectl create -f prometheus-config.yaml
                                 $KubeCtlApplyPrometheusConfigMap += kubectl apply -f prometheus-configmap.yaml
@@ -2562,7 +2974,7 @@ data:
                         }
                         elseif($ServiceAccountCondition.Count -eq 1){
                             if($ServiceAccountCondition -match $True){
-                                Write-Host 'Service observability stack now creates the prometheus configuration'
+                                Write-Host 'Service observability stack now creates the prometheus configuration.'
                                 cd $ProjectPrometheusConfigPath
                                 $KubeCtlCreatePrometheusConfig += kubectl create -f prometheus-config.yaml
                                 $KubeCtlApplyPrometheusConfigMap += kubectl apply -f prometheus-configmap.yaml
@@ -2638,3 +3050,546 @@ data:
 
 
 # KUBERNETES OBSERVABILITY STACK GET METRIC DATA
+function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_MINIKUBE-Deploy_Prometheus_Observability_Stack
+
+.DESCRIPTION
+    Deploying prometheus and grafana to the minicube.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Boolean
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+                
+                # MiniKube deployment
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath $ProjectName
+                    if(Test-Path $ProjectPath){
+                        cd $ProjectPath
+                        
+                        # Get ticks
+                        [string]$Ticks = (Get-Date).Ticks
+
+                        # Create paths
+                        $ProjectPrometheusPath           = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
+                        $ProjectPrometheusMetricsPath    = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
+                        $ProjectPrometheusMetricsCpuPath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath 'cpu'
+                        $PrometheusMetricsCpuItemPath    = Join-Path -Path $ProjectPrometheusMetricsCpuPath -ChildPath ($Ticks+'.json')
+                        $ProjectPrometheusServerUrlPath  = Join-Path -Path $ProjectPrometheusPath -ChildPath 'prometheus-server-url.txt'
+
+                        # Create prometheus directory
+                        if(Test-Path $ProjectPrometheusPath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusPath -Force -Verbose
+                        }
+
+                        # Create prometheus metrics directory
+                        if(Test-Path $ProjectPrometheusMetricsPath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsPath -Force -Verbose
+                        }
+
+                        # Create prometheus cpu directory
+                        if(Test-Path $ProjectPrometheusMetricsCpuPath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsCpuPath -Force -Verbose
+                        }
+                        
+                        $ServiceAccountCondition   = @()
+                        $KubeCtlGetServiceAccounts = @()
+
+                        # Get service account list
+                        $KubeCtlGetServiceAccounts += kubectl get serviceaccounts
+
+                        # Write output
+                        foreach($Output in $KubeCtlGetServiceAccounts){
+                            Write-Host $Output
+                        }
+
+                        # Find current service account
+                        foreach($ServiceAccount in $KubeCtlGetServiceAccounts){
+                            if($ServiceAccount -match 'prometheus-server'){
+                                $ServiceAccountCondition += $True
+                            }
+                            else{
+                                $ServiceAccountCondition += $False
+                            }
+                        }
+
+                        # Compare service accounts condition
+                        if($ServiceAccountCondition.Count -gt 1){
+                            if($ServiceAccountCondition -match $True){
+                                # Get prometheus-server url address process
+                                $RunspaceName              = 'prometheus-server'
+                                $RunspaceScriptBlock       = {minikube service prometheus-server --url > prometheus-server-url.txt}
+                                $RunspaceCommandType       = 'Decode-Command'
+                                $RunspaceProcedureMethod   = 'Test-Path'
+                                $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
+                                $RunspaceProcedureDateTime = Get-Date
+                                $RunspaceWindowStyle       = 'Normal'
+                                $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $RunspaceScriptBlock -CommandType $RunspaceCommandType -ProcedureMethod $RunspaceProcedureMethod -ProcedureInput $RunspaceProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $RunspaceWindowStyle
+
+                                if($InvokeRunspaceProcedure){
+                                    Write-Host 'Service observability stack now creates the prometheus metric log for MEMORY.'
+
+                                    # Invoke query
+                                    $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
+                                    $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
+                                    $PrometheusUrl       = $PrometheusServerUrl[1]
+                                    $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
+                                    $PrometheusOutput    = Invoke-RestMethod -Method Get -Uri $PrometheusUri
+                                    $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
+                                    
+                                    # Write output
+                                    foreach($Output in $PrometheusOutput){
+                                        Write-Host $Output
+                                    }
+
+                                    # Create cpu file
+                                    if(Test-Path $PrometheusMetricsCpuItemPath){
+                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                    }
+                                    else{
+                                        $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsCpuItemPath -Force -Verbose
+                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                    }
+                                }
+                                else{
+                                    Write-Warning 'Invoke runspace procedure is not valid.'
+                                }
+                            }
+                            else{
+                                Write-Warning 'Service deployment for prometheus-server is not exists.'
+                            }
+                        }
+                        elseif($ServiceAccountCondition.Count -eq 1){
+                            if($ServiceAccountCondition -match $True){
+                                # Get prometheus-server url address process
+                                $RunspaceName              = 'prometheus-server'
+                                $RunspaceScriptBlock       = {minikube service prometheus-server --url > prometheus-server-url.txt}
+                                $RunspaceCommandType       = 'Decode-Command'
+                                $RunspaceProcedureMethod   = 'Test-Path'
+                                $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
+                                $RunspaceProcedureDateTime = Get-Date
+                                $RunspaceWindowStyle       = 'Normal'
+                                $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $RunspaceScriptBlock -CommandType $RunspaceCommandType -ProcedureMethod $RunspaceProcedureMethod -ProcedureInput $RunspaceProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $RunspaceWindowStyle
+
+                                if($InvokeRunspaceProcedure){
+                                    Write-Host 'Service observability stack now creates the prometheus metric log for MEMORY.'
+
+                                    # Invoke query
+                                    $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
+                                    $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
+                                    $PrometheusUrl       = $PrometheusServerUrl[1]
+                                    $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
+                                    $PrometheusOutput    = Invoke-RestMethod -Method Get -Uri $PrometheusUri
+                                    $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
+                                    
+                                    # Write output
+                                    foreach($Output in $PrometheusOutput){
+                                        Write-Host $Output
+                                    }
+
+                                    # Create cpu file
+                                    if(Test-Path $PrometheusMetricsCpuItemPath){
+                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                    }
+                                    else{
+                                        $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsCpuItemPath -Force -Verbose
+                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                    }
+                                }
+                                else{
+                                    Write-Warning 'Invoke runspace procedure is not valid.'
+                                }
+                            }
+                            else{
+                                Write-Warning 'Service deployment for prometheus-server is not exists.'
+                            }
+                        }
+                        else{
+                            Write-Warning 'The result for comparing service accounts is not valid.'
+                        }
+
+                    }
+                    else{
+                        Write-Warning 'Project: '+$ProjectPath+'is not exist.'
+                    }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
+
+function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
+<#
+.SYNOPSIS
+    Procedure definition:
+    PROCEDURE_MINIKUBE-Deploy_Prometheus_Observability_Stack
+
+.DESCRIPTION
+    Deploying prometheus and grafana to the minicube.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    Boolean
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube deployment
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath  $ProjectName
+                    if(Test-Path $ProjectPath){
+                        cd $ProjectPath
+
+                        # Get ticks
+                        [string]$Ticks = (Get-Date).Ticks
+
+                        # Create paths
+                        $ProjectPrometheusPath           = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
+                        $ProjectPrometheusMetricsPath    = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
+                        $ProjectPrometheusMetricsCpuPath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath 'cpu'
+                        $PrometheusMetricsCpuItemPath    = Join-Path -Path $ProjectPrometheusMetricsCpuPath -ChildPath ($Ticks+'.json')
+                        $ProjectPrometheusServerUrlPath  = Join-Path -Path $ProjectPrometheusPath -ChildPath 'prometheus-server-url.txt'
+
+                        # Create prometheus directory
+                        if(Test-Path $ProjectPrometheusPath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusPath -Force -Verbose
+                        }
+
+                        # Create prometheus metrics directory
+                        if(Test-Path $ProjectPrometheusMetricsPath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsPath -Force -Verbose
+                        }
+
+                        # Create prometheus cpu directory
+                        if(Test-Path $ProjectPrometheusMetricsCpuPath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsCpuPath -Force -Verbose
+                        }
+
+                        $ServiceAccountCondition         = @()
+                        $KubeCtlGetServiceAccounts       = @()
+
+                        # Get service account list
+                        $KubeCtlGetServiceAccounts += kubectl get serviceaccounts
+
+                        # Write output
+                        foreach($Output in $KubeCtlGetServiceAccounts){
+                            Write-Host $Output
+                        }
+
+                        # Find current service account
+                        foreach($ServiceAccount in $KubeCtlGetServiceAccounts){
+                            if($ServiceAccount -match 'prometheus-server'){
+                                $ServiceAccountCondition += $True
+                            }
+                            else{
+                                $ServiceAccountCondition += $False
+                            }
+                        }
+
+                        # Compare service accounts condition
+                        if($ServiceAccountCondition.Count -gt 1){
+                            if($ServiceAccountCondition -match $True){
+                                # Get prometheus-server url address process
+                                $RunspaceName              = 'prometheus-server'
+                                $RunspaceScriptBlock       = {minikube service prometheus-server --url > prometheus-server-url.txt}
+                                $RunspaceCommandType       = 'Decode-Command'
+                                $RunspaceProcedureMethod   = 'Test-Path'
+                                $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
+                                $RunspaceProcedureDateTime = Get-Date
+                                $RunspaceWindowStyle       = 'Normal'
+                                $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $Name -ScriptBlock $ScriptBlock -CommandType $CommandType -ProcedureMethod $ProcedureMethod -ProcedureInput $ProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $WindowStyle
+
+                                if($InvokeRunspaceProcedure){
+                                    Write-Host 'Service observability stack now creates the prometheus metric log for CPU.'
+
+                                    # Invoke query
+                                    $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
+                                    $PrometheusQuery     = 'sum(rate(container_cpu_usage_seconds_total{container_name!="POD", container_name!="", image!="",namespace!="kube-system"}[1m])) by (namespace, pod, container)'
+                                    $PrometheusUrl       = $PrometheusServerUrl[1]
+                                    $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
+                                    $PrometheusOutput    = Invoke-RestMethod -Method Get -Uri $PrometheusUri
+                                    $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
+                                    
+                                    # Write output
+                                    foreach($Output in $PrometheusOutput){
+                                        Write-Host $Output
+                                    }
+
+                                    # Create cpu file
+                                    if(Test-Path $PrometheusMetricsCpuItemPath){
+                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                    }
+                                    else{
+                                        $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsCpuItemPath -Force -Verbose
+                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                    }
+                                }
+                                else{
+                                    Write-Warning 'Invoke runspace procedure is not valid.'
+                                }
+                            }
+                            else{
+                                Write-Warning 'Service deployment for prometheus-server is not exists.'
+                            }
+                        }
+                        elseif($ServiceAccountCondition.Count -eq 1){
+                            if($ServiceAccountCondition -match $True){
+                                # Get prometheus-server url address process
+                                $RunspaceName              = 'prometheus-server'
+                                $RunspaceScriptBlock       = {minikube service prometheus-server --url > prometheus-server-url.txt}
+                                $RunspaceCommandType       = 'Decode-Command'
+                                $RunspaceProcedureMethod   = 'Test-Path'
+                                $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
+                                $RunspaceProcedureDateTime = Get-Date
+                                $RunspaceWindowStyle       = 'Normal'
+                                $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $Name -ScriptBlock $ScriptBlock -CommandType $CommandType -ProcedureMethod $ProcedureMethod -ProcedureInput $ProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $WindowStyle
+
+                                if($InvokeRunspaceProcedure){
+                                    Write-Host 'Service observability stack now creates the prometheus metric log for CPU.'
+
+                                    # Invoke query
+                                    $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
+                                    $PrometheusQuery     = 'sum(rate(container_cpu_usage_seconds_total{container_name!="POD", container_name!="", image!="",namespace!="kube-system"}[1m])) by (namespace, pod, container)'
+                                    $PrometheusUrl       = $PrometheusServerUrl[1]
+                                    $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
+                                    $PrometheusOutput    = Invoke-RestMethod -Method Get -Uri $PrometheusUri
+                                    $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
+                                    
+                                    # Write output
+                                    foreach($Output in $PrometheusOutput){
+                                        Write-Host $Output
+                                    }
+
+                                    # Create cpu file
+                                    if(Test-Path $PrometheusMetricsCpuItemPath){
+                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                    }
+                                    else{
+                                        $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsCpuItemPath -Force -Verbose
+                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
+                                    }
+                                }
+                                else{
+                                    Write-Warning 'Invoke runspace procedure is not valid.'
+                                }
+                            }
+                            else{
+                                Write-Warning 'Service deployment for prometheus-server is not exists.'
+                            }
+                        }
+                        else{
+                            Write-Warning 'The result for comparing service accounts is not valid.'
+                        }
+
+                    }
+                    else{
+                        Write-Warning 'Project: '+$ProjectPath+'is not exist.'
+                    }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}
