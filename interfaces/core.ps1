@@ -3467,16 +3467,21 @@ function Invoke-Runspace_Procedure {
                         if($ProcedureMethod -eq 'Test-Path'){
                             if(Test-Path $ProcedureInput){
                                 $ProcedureGetItem = Get-Item $ProcedureInput -Force
-                                Write-Host $ProcedureGetItem.LastAccessTime
+                                Write-Host $ProcedureGetItem.LastWriteTime
                                 Write-Host $ProcedureDateTime
-                                if($ProcedureGetItem.LastAccessTime -gt $ProcedureDateTime){
+                                Write-Host $ProcedureGetItem.Name
+                                Write-Host 'aaaaaaaaaaaaaaaaaaaaaaaaaaa'
+                                if($ProcedureGetItem.LastWriteTime -gt $ProcedureDateTime){
                                     $ProcedureCondition = $True
+                                    Write-Host 'bbbbbbbbbbbbbbbbbbbbbbbbbbbb'
                                 }
                                 else{
                                     if($Repeat -gt 5){
+                                        Write-Host 'ccccccccccccccccccccccccccccc'
                                         $ProcedureCondition = $False
                                     }
                                     else{
+                                        Write-Host 'ddddddddddddddddddddddddddddd'
                                         $RunspaceProcess |iex -ErrorAction SilentlyContinue
                                     }
                                 }

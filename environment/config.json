@@ -150,11 +150,6 @@
           "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric",
           "MD": false,
           "Data":[]
-        },
-        {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric",
-          "MD": false,
-          "Data":[]
         }
       ],
       "any_procedure_name": []
