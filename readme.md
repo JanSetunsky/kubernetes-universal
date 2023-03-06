@@ -60,13 +60,20 @@ These files represent the routine definition and verification of the built proje
 
 ### Procedures
 
-The `.interfaces/kubernetes_procedures.ps1` file includes a section named ListOfProcedures where the given input syntax must be followed and where the DevOps CI/CD operation automation procedures are specified.
+The `.interfaces/kubernetes_procedures.ps1` file contains automation routines that are called from the project configuration file.
+This makes it possible to share additional data in the configuration file, for example as follows:
+{
+    "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Prometheus",
+    "MD": false,
+    "Data":[{
+        "StackName": "prometheus",
+        "StackFullName": "prometheus-community",
+        "StackUri": "https://prometheus-community.github.io/helm-charts"
+    }]
+}
+This means that we can pass data to procedures using date and other variables. Thanks to this, we can pass variables directly to procedures and thus create universal functions.
 
 The `.environment/config.json` file contains a section called ListOfProcedures where the given input syntax must be followed and where the procedures for automating the DevOps CI/CD operation are specified.
 
-These procedures run specific functions from the `.procedures.ps1` file, where we can create specific functions for a given automation of routine activities for DevOps operation.
+These procedures trigger specific functions where we can create specific routine processes for a given automation of DevOps development activities.
 
-### Start,Stop,Deploy,Delete
-
-The environment includes 4 basic launchers for starting MiniKube, stopping MiniKube, deploying nginx-demo, deleting nginx-demo.
-Over time I will create more universal functions and move the configuration elements to the `.environment/config.json side of the configuration file.
