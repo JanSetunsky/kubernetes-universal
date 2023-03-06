@@ -2,7 +2,7 @@
 
 This is a demonstration of how to build a universal environment for deploying, for example, 
 Kubernetes, or others, and managing automation operations with the DevOps CI/CD method.
-All automation processes can be automated from A to Z using PowerShell. 
+All automation processes can be automated from A to Z using procedures. 
 
 ## The lifecycle of an application build
 
@@ -16,7 +16,7 @@ You can see an example of this in the `environment/config.json` file.
 ### Dependency environment database
 
 Next, we need to populate the database configuration files that represent local and/or shared configuration dependencies.
-They are `.modules.json` , `.packages.json` , `.github.json` and `.gitlab.json` files
+They are `.db/modules.json` , `.db/packages.json` , `.db/github.json` and `.db/gitlab.json` files
 
 #### GitHub and GitLab
 
@@ -31,6 +31,8 @@ Modules represent PowerShell module manifests. If you fill in the modules, you w
 Packages represent application names and their installation scheme. If you fill in the packages, you will be prompted to confirm the installation of the packages when you run this installation.
 
 ### Installation
+
+There are two installation options, which can be found in the setup folder. There is either `.setup/install_environment.ps1` or `.setup/fullautomation.ps1`.
 
 After creating the environment, we can start the installation. If you use the configuration file that is included in the `.Environment/...` folder, the environment will be installed on the local disk and your computer will be ready to run kubernetes using the MiniKube application that I chose for testing.
 
