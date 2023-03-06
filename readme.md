@@ -62,7 +62,7 @@ These files represent the routine definition and verification of the built proje
 
 The `.interfaces/kubernetes_procedures.ps1` file contains automation routines that are called from the project configuration file.
 This makes it possible to share additional data in the configuration file, for example as follows:
-`
+``` 
 {
     "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Prometheus",
     "MD": false,
@@ -72,7 +72,7 @@ This makes it possible to share additional data in the configuration file, for e
         "StackUri": "https://prometheus-community.github.io/helm-charts"
     }]
 }
-`
+``` 
 This means that we can pass data to procedures using date and other variables. Thanks to this, we can pass variables directly to procedures and thus create universal functions.
 
 The `.environment/config.json` file contains a section called ListOfProcedures where the given input syntax must be followed and where the procedures for automating the DevOps CI/CD operation are specified.
