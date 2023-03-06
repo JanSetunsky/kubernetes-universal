@@ -7,7 +7,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Start_Local_Cluster {
 
 .DESCRIPTION
     First, the status of the cluster is determined, if it is available, and then 
-    the start of the cluster itself is started, otherwise the cluster is already running.
+    the start of the cluster itself is started, otherwise the cluster is already running or is suspended.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -143,11 +143,11 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Stop_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Stop-MiniKube_cluster
+    LOCALHOST_PROCEDURE_MINIKUBE-Stop_Local_Cluster
 
 .DESCRIPTION
-    First, the status of the cluster is determined, whether it is available, and then 
-    the termination of the cluster itself is triggered, otherwise the cluster is shut down.
+    First, the status of the cluster is determined as to whether it is available, and then
+    initiates a cluster shutdown. If exit does not run, the cluster is already shut down or suspended.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -273,11 +273,11 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Pause_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Stop-MiniKube_cluster
+    LOCALHOST_PROCEDURE_MINIKUBE-Pause_Local_Cluster
 
 .DESCRIPTION
-    First, the status of the cluster is determined, whether it is available, and then 
-    the termination of the cluster itself is triggered, otherwise the cluster is shut down.
+    First, the status of the cluster is determined as to whether it is available.
+    If the cluster is on, it will pause. If the cluster is stopped or suspended, nothing happens.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -403,11 +403,11 @@ function LOCALHOST_PROCEDURE_MINIKUBE-UnPause_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Stop-MiniKube_cluster
+    LOCALHOST_PROCEDURE_MINIKUBE-UnPause_Local_Cluster
 
 .DESCRIPTION
-    First, the status of the cluster is determined, whether it is available, and then 
-    the termination of the cluster itself is triggered, otherwise the cluster is shut down.
+    First, the status of the cluster is determined as to whether it is available.
+    If the cluster is suspended, it will start again. If the cluster is stopped or started, nothing happens.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -533,11 +533,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Delete_Local_Cluster {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Stop-MiniKube_cluster
+    LOCALHOST_PROCEDURE_MINIKUBE-Delete_Local_Cluster
 
 .DESCRIPTION
-    First, the status of the cluster is determined, whether it is available, and then 
-    the termination of the cluster itself is triggered, otherwise the cluster is shut down.
+    First, the state of the cluster is determined, according to the state of the cluster, it is shut down and deleted.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -669,11 +668,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Delete_All_Clusters {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Stop-MiniKube_cluster
+    LOCALHOST_PROCEDURE_MINIKUBE-Delete_All_Clusters
 
 .DESCRIPTION
-    First, the status of the cluster is determined, whether it is available, and then 
-    the termination of the cluster itself is triggered, otherwise the cluster is shut down.
+    First, the state of the cluster is determined, according to the state of the cluster, it is shut down and deleted.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -805,7 +803,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
 <#
 .SYNOPSIS
     Procedure definition:
-    PROCEDURE_Get-MiniKube_cluster_Status
+    LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status
 
 .DESCRIPTION
     This function determines the state of the cluster and then returns a ps custom object
