@@ -152,7 +152,7 @@
           "Data": []
         },
         {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metric",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics",
           "MD": false,
           "Data": [
             {
@@ -169,7 +169,7 @@
       ],
       "LOCALHOST_MINIKUBE_OBSERVABILITY_STACK_Get_Prometheus_Metrics": [
         {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metric",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics",
           "MD": false,
           "Data": [
             {
