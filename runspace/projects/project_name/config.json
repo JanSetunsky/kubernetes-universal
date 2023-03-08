@@ -154,17 +154,29 @@
         {
           "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metrics",
           "MD": false,
-          "Data": []
+          "Data": [
+            {
+              "PrometheusUrl": "127.0.0.1:9091",
+              "ListOfMetric": [
+                {
+                  "Name": "Memory"
+                }
+              ]
+            }
+          ]
         }
       ],
       "LOCALHOST_MINIKUBE_OBSERVABILITY_STACK_Get_Prometheus_Metrics": [
         {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics",
           "MD": false,
           "Data": [
             {
               "PrometheusUrl": "127.0.0.1:9091",
               "ListOfMetric": [
+                {
+                  "Name": "Cpu"
+                },
                 {
                   "Name": "Memory"
                 }

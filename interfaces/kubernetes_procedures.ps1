@@ -3200,7 +3200,7 @@ data:
 
 
 # KUBERNETES OBSERVABILITY STACK GET METRIC DATA
-function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
+function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -3273,6 +3273,8 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                     if(Test-Path $ProjectPath){
                         cd $ProjectPath
                         
+                        $RequiredPodName = 'prometheus-server'
+
                         # Create paths
                         $ProjectPrometheusPath        = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
                         $ProjectPrometheusMetricsPath = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
@@ -3308,7 +3310,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
 
                         # Find current service account
                         foreach($ServiceAccount in $KubeCtlGetServiceAccounts){
-                            if($ServiceAccount -match 'prometheus-server'){
+                            if($ServiceAccount -match $RequiredPodName){
                                 $ServiceAccountCondition += $True
                             }
                             else{
@@ -3326,9 +3328,9 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
 
                         # Find current service account
                         foreach($Pod in $KubeCtlGetPods){
-                            if($Pod -match 'prometheus-server'){
+                            if($Pod -match $RequiredPodName){
                                 $PodCondition += $True
-                                $Regex = "prometheus-server-\w+-\w+"
+                                $Regex = ($RequiredPodName+"-\w+-\w+")
                                 $Match = [regex]::Match($Pod, $Regex)
                                 $PodName = $Match.Value
                             }
@@ -3341,7 +3343,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                         if($ServiceAccountCondition -match $True){
                             if($PodCondition -match $True){
                                 # Prepare kubernetes tunnel
-                                $RunspaceName        = 'prometheus-server'
+                                $RunspaceName        = $PodName
                                 $RunspaceCommandType = 'Decode-Command'
                                 $RunspaceWindowStyle = 'Normal'
                                 $KubernetesNameSpace = 'default'
@@ -3381,10 +3383,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                             $NewItem = New-Item -ItemType Directory -Path $CurrentMetricPath -Force -Verbose
                                         }
 
-                                        if($MetricName -eq 'Memory'){
+                                        if($MetricName -eq 'Cpu'){
                                             # Create metric query
                                             $MetricCondition = $True
-                                            $MetricQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
+                                            $MetricQuery     = 'sum(container_cpu_usage_seconds_total{pod="importpod"}) by (namespace, pod, container)' -replace 'importpod',$PodName
+                                            $PrometheusUri   = "$PrometheusUrl/api/v1/query?query=$MetricQuery"
+                                        }
+                                        elseif($MetricName -eq 'Memory'){
+                                            # Create metric query
+                                            $MetricCondition = $True
+                                            $MetricQuery     = 'sum(container_memory_usage_bytes{pod="importpod"}) by (namespace, pod, container)' -replace 'importpod',$PodName
                                             $PrometheusUri   = "$PrometheusUrl/api/v1/query?query=$MetricQuery"
                                         }
                                         else{

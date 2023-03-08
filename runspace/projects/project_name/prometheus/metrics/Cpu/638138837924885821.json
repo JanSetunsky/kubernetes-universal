@@ -1,0 +1,155 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "vector",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1678283393.546,
+          "108242.72150150003"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "prometheus-prometheus-node-exporter-kfd4n"
+        },
+        "value": [
+          1678283393.546,
+          "66.8318371"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "prometheus-server-55db4c8c5d-q5jl2"
+        },
+        "value": [
+          1678283393.546,
+          "818.4596906"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "storage-provisioner"
+        },
+        "value": [
+          1678283393.546,
+          "374.8564883"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "kube-proxy-pjcb5"
+        },
+        "value": [
+          1678283393.546,
+          "75.8828498"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "nginx-demo-5859956db4-jcvgk"
+        },
+        "value": [
+          1678283393.546,
+          "0.0896711"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "grafana-6bd55545d6-j68ft"
+        },
+        "value": [
+          1678283393.546,
+          "206.6439921"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "prometheus-alertmanager-0"
+        },
+        "value": [
+          1678283393.546,
+          "347.2260412"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "prometheus-kube-state-metrics-7f6769f7c6-hbpxw"
+        },
+        "value": [
+          1678283393.546,
+          "138.6860272"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "prometheus-prometheus-pushgateway-684dc6674-k578t"
+        },
+        "value": [
+          1678283393.546,
+          "42.8213734"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "coredns-787d4945fb-m252k"
+        },
+        "value": [
+          1678283393.546,
+          "495.6135715"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "kube-scheduler-minikube"
+        },
+        "value": [
+          1678283393.546,
+          "602.1708877"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "kube-controller-manager-minikube"
+        },
+        "value": [
+          1678283393.546,
+          "4561.1345379"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "kube-apiserver-minikube"
+        },
+        "value": [
+          1678283393.546,
+          "9699.9922866"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "etcd-minikube"
+        },
+        "value": [
+          1678283393.546,
+          "5476.7640791"
+        ]
+      }
+    ]
+  }
+}
