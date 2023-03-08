@@ -3367,8 +3367,8 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                                     }
                                 } -replace 'importnamespace',$KubernetesNameSpace -replace 'importpodname',$PodName -replace 'importports',$KubernetesPorts
 
+                                # Start new runspace
                                 $RunspaceProcessDetail = New-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $TunnelScriptBlock -CommandType $RunspaceCommandType -WindowStyle $RunspaceWindowStyle -ErrorAction SilentlyContinue
-                                sleep 2
                                 
                                 if($RunspaceProcessDetail.Condition){
                                     # Prepare prometheus query
@@ -3394,7 +3394,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                                     else{
                                         Write-Warning ('The query could not be retrieved.')
                                     }
-                                    
+
                                     # Kill runspace process
                                     KILL $RunspaceProcessDetail.ProcessID
                                 }
