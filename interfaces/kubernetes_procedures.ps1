@@ -3620,7 +3620,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                             }
                                         }
                                     }
-                                    elseif($MetricName -eq 'HardDisk'){
+                                    elseif($MetricName -eq 'Hard-Disk'){
                                         # Create metric query
                                         switch ($MetricType) {
                                             1 {
@@ -3812,7 +3812,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                             }
                                         }
                                     }
-                                    elseif($MetricName -eq 'WebServer'){
+                                    elseif($MetricName -eq 'Web-Server'){
                                         # Create metric query
                                         switch ($MetricType) {
                                             1 {
@@ -4289,7 +4289,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                                 $MetricConditionList += $True
                                                 $MetricTypeName = 'pod-network-traffic'
                                                 $MetricDesc     = 'Query the incoming and outgoing network traffic of a Kubernetes pod over a given time interval.'
-                                                $MetricQuery    = 'sum(rate(container_network_receive_bytes_total{namespace="default", pod=~"myapp."}[5m])) by (pod), sum(rate(container_network_transmit_bytes_total{namespace="default", pod=~"myapp."}[5m])) by (pod)'
+                                                $MetricQuery    = 'sum(rate(container_network_receive_bytes_total{namespace="default",pod=~"myapp."}[5m])) by (pod)%20%2B%20sum(rate(container_network_transmit_bytes_total{namespace="default",pod=~"myapp."}[5m])) by (pod)'
                                                 $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
                                                 $QueryPSCO      = [PSCustomObject]@{
                                                     Type = $MetricTypeName
@@ -4302,7 +4302,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                                 $MetricConditionList += $True
                                                 $MetricTypeName = 'pod-network-usage'
                                                 $MetricDesc     = 'Query the network usage of a given pod in a given time interval.'
-                                                $MetricQuery    = 'sum(rate(container_network_receive_bytes_total{pod_name="my-pod"}[5m])) + sum(rate(container_network_transmit_bytes_total{pod_name="my-pod"}[5m]))'
+                                                $MetricQuery    = 'sum(rate(container_network_receive_bytes_total{pod_name="my-pod"}[5m]))%20%2B%20sum(rate(container_network_transmit_bytes_total{pod_name="my-pod"}[5m]))'
                                                 $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
                                                 $QueryPSCO      = [PSCustomObject]@{
                                                     Type = $MetricTypeName
@@ -4529,6 +4529,89 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                                 $MetricTypeName = 'service-request-rate'
                                                 $MetricDesc     = 'Query the rate of requests to a Kubernetes service over a given time interval.'
                                                 $MetricQuery    = 'sum(rate(http_requests_total{namespace="default", kubernetes_name="my-service"}[5m])) by (kubernetes_name)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                        }
+                                    }
+                                    elseif($MetricName -eq 'Cluster-State'){
+                                        # Create metric query
+                                        switch ($MetricType) {
+                                            1 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'node-cpu-usage'
+                                                $MetricDesc     = 'Query the average CPU usage of all Kubernetes nodes over a given time interval.'
+                                                $MetricQuery    = 'avg(rate(node_cpu_seconds_total{mode!="idle"}[5m])) by (instance)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            2 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'node-memory-usage'
+                                                $MetricDesc     = 'Query the average memory usage of all Kubernetes nodes over a given time interval.'
+                                                $MetricQuery    = 'avg(node_memory_MemTotal_bytes - (node_memory_MemFree_bytes%20%2B%20node_memory_Buffers_bytes%20%2B%20node_memory_Cached_bytes)) by (instance)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            3 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-cpu-usage'
+                                                $MetricDesc     = 'Query the average CPU usage of a Kubernetes pod over a given time interval.'
+                                                $MetricQuery    = 'avg(rate(container_cpu_usage_seconds_total{namespace="default", pod=~"myapp.*"}[5m])) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            4 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-memory-usage'
+                                                $MetricDesc     = 'Query the average memory usage of a Kubernetes pod over a given time interval.'
+                                                $MetricQuery    = 'avg_over_time(container_memory_working_set_bytes{namespace="default", pod=~"myapp.*"}[5m])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            5 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'node-cpu-usage'
+                                                $MetricDesc     = 'Query the average CPU usage of a Kubernetes node over a given time interval.'
+                                                $MetricQuery    = 'avg(rate(node_cpu_seconds_total{mode!="idle"}[5m])) by (instance)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            6 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'node-memory-usage'
+                                                $MetricDesc     = 'Query the average memory usage of a Kubernetes node over a given time interval.'
+                                                $MetricQuery    = 'avg(rate(container_cpu_usage_seconds_total{namespace="default", pod=~"myapp.*"}[5m])) by (pod)'
                                                 $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
                                                 $QueryPSCO      = [PSCustomObject]@{
                                                     Type = $MetricTypeName
