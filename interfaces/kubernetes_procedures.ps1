@@ -3384,8 +3384,9 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                         $PrometheusOutput = Invoke-RestMethod -Method GET -Uri $PrometheusUri -Verbose
     
                                         if($PrometheusOutput.Status -eq 'Success'){
+                                            # Convert metric data to json
                                             $PrometheusJson = $PrometheusOutput | ConvertTo-Json -Depth 100
-                                            Write-Host $RunspacePid
+
                                             # Create Memory file
                                             if(Test-Path $CurrentMetricItemPath){
                                                 $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $PrometheusJson -Force -Verbose

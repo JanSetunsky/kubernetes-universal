@@ -141,8 +141,8 @@
             "PrometheusUrl": "127.0.0.1:9091",
             "ListOfMetric": [
               {
-                "Name" : "Memory",
-                "Query" : "sum(container_memory_usage_bytes) by (namespace, pod, container)"
+                "Name": "Memory",
+                "Query": "sum(container_memory_usage_bytes) by (namespace, pod, container)"
               }
             ]
           }]
@@ -156,8 +156,8 @@
             "PrometheusUrl": "127.0.0.1:9091",
             "ListOfMetric": [
               {
-                "Name" : "Memory",
-                "Query" : "sum(container_memory_usage_bytes) by (namespace, pod, container)"
+                "Name": "Memory",
+                "Query": "sum(container_memory_usage_bytes) by (namespace, pod, container)"
               }
             ]
           }]
