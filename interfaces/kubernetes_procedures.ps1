@@ -3360,11 +3360,17 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                 if($RunspaceProcessDetail.Condition){
                                     # Prepare prometheus query from List Of Metric
                                     foreach ($Metric in $ProcedureData.ListOfMetric){
+                                        # Procedure variables
+                                        $PrometheusUrl = $ProcedureData.PrometheusUrl
+
+                                        # Metric variables
+                                        $MetricName = $Metric.Name
+
                                         # Get ticks
                                         [string]$Ticks = (Get-Date).Ticks
 
                                         # Metric path
-                                        $CurrentMetricPath     = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath $Metric.Name
+                                        $CurrentMetricPath     = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath $MetricName
                                         $CurrentMetricItemPath = Join-Path -Path $CurrentMetricPath -ChildPath ($Ticks+'.json')
 
                                         # Create prometheus current metric directory
@@ -3375,25 +3381,35 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                             $NewItem = New-Item -ItemType Directory -Path $CurrentMetricPath -Force -Verbose
                                         }
 
-                                        # Create metric query
-                                        $PrometheusUrl   = $ProcedureData.PrometheusUrl
-                                        $PrometheusQuery = $Metric.Query
-                                        $PrometheusUri   = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
-                                        
-                                        # Get metrics
-                                        $PrometheusOutput = Invoke-RestMethod -Method GET -Uri $PrometheusUri -Verbose
-    
-                                        if($PrometheusOutput.Status -eq 'Success'){
-                                            # Convert metric data to json
-                                            $PrometheusJson = $PrometheusOutput | ConvertTo-Json -Depth 100
+                                        if($MetricName -eq 'Memory'){
+                                            # Create metric query
+                                            $MetricCondition = $True
+                                            $MetricQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
+                                            $PrometheusUri   = "$PrometheusUrl/api/v1/query?query=$MetricQuery"
+                                        }
+                                        else{
+                                            $MetricCondition = $False
+                                        }
 
-                                            # Create Metric item file
-                                            if(Test-Path $CurrentMetricItemPath){
-                                                $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $PrometheusJson -Force -Verbose
+                                        if($MetricCondition){
+                                            # Get metrics
+                                            $PrometheusOutput = Invoke-RestMethod -Method GET -Uri $PrometheusUri -Verbose
+        
+                                            if($PrometheusOutput.Status -eq 'Success'){
+                                                # Convert metric data to json
+                                                $PrometheusJson = $PrometheusOutput | ConvertTo-Json -Depth 100
+
+                                                # Create Metric item file
+                                                if(Test-Path $CurrentMetricItemPath){
+                                                    $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $PrometheusJson -Force -Verbose
+                                                }
+                                                else{
+                                                    $NewItem    = New-Item -ItemType File -Path $CurrentMetricItemPath -Force -Verbose
+                                                    $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $PrometheusJson -Force -Verbose
+                                                }
                                             }
                                             else{
-                                                $NewItem    = New-Item -ItemType File -Path $CurrentMetricItemPath -Force -Verbose
-                                                $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $PrometheusJson -Force -Verbose
+                                                Write-Warning ('The query could not be retrieved.')
                                             }
                                         }
                                         else{
