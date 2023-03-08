@@ -3749,7 +3749,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                                                 $MetricConditionList += $True
                                                 $MetricTypeName = 'total-network-traffic-in-5m-interval'
                                                 $MetricDesc     = 'Query the total network traffic on a given node.'
-                                                $MetricQuery    = 'irate(node_network_receive_bytes_total[5m]) + irate(node_network_transmit_bytes_total[5m])'
+                                                $MetricQuery    = 'sum(increase(node_network_receive_bytes_total[5m]))%20%2B%20sum(increase(node_network_transmit_bytes_total[5m]))'
                                                 $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
                                                 $QueryPSCO      = [PSCustomObject]@{
                                                     Type = $MetricTypeName
@@ -3762,7 +3762,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                                                 $MetricConditionList += $True
                                                 $MetricTypeName = 'average-speed-network-traffic-in-5m-interval'
                                                 $MetricDesc     = 'Query the average speed of network traffic in a given time interval.'
-                                                $MetricQuery    = 'avg_over_time(node_network_receive_bytes_total[5m]) + avg_over_time(node_network_transmit_bytes_total[5m))'
+                                                $MetricQuery    = 'avg_over_time(rate(node_network_receive_bytes_total[5m])[5m:])%20%2B%20avg_over_time(rate(node_network_transmit_bytes_total[5m])[5m:])'
                                                 $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
                                                 $QueryPSCO      = [PSCustomObject]@{
                                                     Type = $MetricTypeName
@@ -3853,10 +3853,13 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                                             $RequestOutputList += $RequestOutput
 
                                             # Get ticks
-                                            [string]$Ticks = (Get-Date).Ticks
+                                            $Ticks = (Get-Date).Ticks
+
+                                            # Create file name
+                                            $MetricFileName = $QueryItemTypeName+'-'+$Ticks+'.json'
 
                                             # Metric item path
-                                            $CurrentMetricItemPath = Join-Path -Path $CurrentMetricPath -ChildPath ($Ticks+'.json')
+                                            $CurrentMetricItemPath = Join-Path -Path $CurrentMetricPath -ChildPath $MetricFileName
 
                                             # Query processor 
                                             if($RequestOutput.Status -eq 'Success'){
