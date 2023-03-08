@@ -3274,17 +3274,18 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                         cd $ProjectPath
                         
                         # Procedure variables
-                        $CommandType = 'Decode-Command'
-                        $Namespace   = $ProcedureData.Namespace
-                        $PodName     = $ProcedureData.PodName
-                        $Ports       = $ProcedureData.Ports
-                        $Url         = $ProcedureData.Url
-                        $WindowStyle = $ProcedureData.WindowStyle
+                        $CommandType   = 'Decode-Command'
+                        $AppName       = $ProcedureData.AppName
+                        $Namespace     = $ProcedureData.Namespace
+                        $ContainerName = $ProcedureData.ContainerName
+                        $Ports         = $ProcedureData.Ports
+                        $Url           = $ProcedureData.Url
+                        $WindowStyle   = $ProcedureData.WindowStyle
 
                         # Create paths
-                        $ProjectPrometheusPath        = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
-                        $ProjectPrometheusMetricsPath = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
-                        $ProjectPrometheusPodNamePath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath $PodName
+                        $ProjectPrometheusPath              = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
+                        $ProjectPrometheusMetricsPath       = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
+                        $ProjectPrometheusContainerNamePath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath $ContainerName
 
                         # Create prometheus directory
                         if(Test-Path $ProjectPrometheusPath){
@@ -3303,11 +3304,11 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                         }
 
                         # Create prometheus pod name metrics directory
-                        if(Test-Path $ProjectPrometheusPodNamePath){
+                        if(Test-Path $ProjectPrometheusContainerNamePath){
                             # pass
                         }
                         else{
-                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusPodNamePath -Force -Verbose
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusContainerNamePath -Force -Verbose
                         }
                        
                         $ServiceAccountCondition   = @()
@@ -3343,9 +3344,9 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
 
                         # Find current service account
                         foreach($Pod in $KubeCtlGetPods){
-                            if($Pod -match $PodName){
+                            if($Pod -match $ContainerName){
                                 $PodCondition += $True
-                                $Regex = ($PodName+"-\w+-\w+")
+                                $Regex = ($ContainerName+"-\w+-\w+")
                                 $Match = [regex]::Match($Pod, $Regex)
                                 $PodName = $Match.Value
                             }
@@ -3353,7 +3354,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                                 $PodCondition += $False
                             }
                         }
-
+                        Write-Host $PodName
                         # Compare service account condition and pod condition
                         if($ServiceAccountCondition -match $True){
                             if($PodCondition -match $True){
@@ -3363,7 +3364,8 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                                 # Prepare prometheus query from List Of Metric
                                 foreach ($Metric in $ProcedureData.ListOfMetric){
                                     # Metric variables
-                                    $MetricName      = $Metric.Name
+                                    $MetricName = $Metric.Name
+                                    $MetricType = $Metric.Type
 
                                     if($RunspaceProcessDetail.Condition){
                                         # pass
@@ -3384,12 +3386,8 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                                         Write-Warning 'Runspace process detail condition is false.'
                                     }
                                     
-                                    # Get ticks
-                                    [string]$Ticks = (Get-Date).Ticks
-
                                     # Metric path
-                                    $CurrentMetricPath     = Join-Path -Path $ProjectPrometheusPodNamePath -ChildPath $MetricName
-                                    $CurrentMetricItemPath = Join-Path -Path $CurrentMetricPath -ChildPath ($Ticks+'.json')
+                                    $CurrentMetricPath = Join-Path -Path $ProjectPrometheusContainerNamePath -ChildPath $MetricName
 
                                     # Create prometheus current metric directory
                                     if(Test-Path $CurrentMetricPath){
@@ -3399,53 +3397,488 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                                         $NewItem = New-Item -ItemType Directory -Path $CurrentMetricPath -Force -Verbose
                                     }
 
+                                    $MetricConditionList = @()
+                                    $RequestOutputList   = @()
+                                    $QueryList           = @()
+
                                     # Metric methods by name
                                     if($MetricName -eq 'Cpu'){
                                         # Create metric query
-                                        $MetricCondition = $True
-                                        $MetricQuery     = 'sum(container_cpu_usage_seconds_total{pod="importpod", namespace="importnamespace"}) by (namespace, pod, container)' -replace 'importpod',$PodName -replace 'importnamespace',$Namespace
-                                        $QueryUri        = "$Url/api/v1/query?query=$MetricQuery"
+                                        switch ($MetricType) {
+                                            1 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'total-cpu-all-containers-in-cluster'
+                                                $MetricDesc     = 'Query the total CPU usage of all containers in the cluster.'
+                                                $MetricQuery    = 'container_cpu_usage_seconds_total'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            2 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'cpu-specific-container'
+                                                $MetricDesc     = 'Query the CPU usage of one specific container.'
+                                                $MetricQuery    = 'container_cpu_usage_seconds_total{container_name="importcontainername"}' -replace 'importcontainername',$ContainerName
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            3 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'average-cpu-all-containers-in-app'
+                                                $MetricDesc     = 'Query the average CPU usage of all containers of the given application.'
+                                                $MetricQuery    = 'avg(container_cpu_usage_seconds_total{namespace="importnamespace", app="importappname"})' -replace 'importnamespace',$Namespace -replace 'importappname',$AppName
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            4 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'maximum-cpu-all-containers-in-cluster'
+                                                $MetricDesc     = 'Query the maximum CPU usage of containers in the cluster.'
+                                                $MetricQuery    = 'max(container_cpu_usage_seconds_total)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            5 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'total-cpu-all-containers-in-node'
+                                                $MetricDesc     = 'Query the total CPU usage of all containers on a given node.'
+                                                $MetricQuery    = 'sum(container_cpu_usage_seconds_total) by (node)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            6 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'cpu-consumed-in-1h-interval'
+                                                $MetricDesc     = 'Query the amount of CPU used in a given time interval.'
+                                                $MetricQuery    = 'increase(container_cpu_usage_seconds_total[1h])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            7 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'average-cpu-all-containers-in-app-in-5m-interval'
+                                                $MetricDesc     = 'Query the average CPU usage of all containers of the given application in a certain time window.'
+                                                $MetricQuery    = 'avg_over_time(container_cpu_usage_seconds_total{namespace="importnamespace", app="importappname"}[5m])' -replace 'importnamespace',$Namespace -replace 'importappname',$AppName
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            8 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'total-cpu-usage-in-pod-and-namespace'
+                                                $MetricDesc     = 'Query the total CPU consumption of a container in a pod in a specific namespace.'
+                                                $MetricQuery    = 'sum(container_cpu_usage_seconds_total{pod="importpod", namespace="importnamespace"}) by (namespace, pod, container)' -replace 'importpod',$PodName -replace 'importnamespace',$Namespace
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                        }
                                     }
                                     elseif($MetricName -eq 'Memory'){
                                         # Create metric query
-                                        $MetricCondition = $True
-                                        $MetricQuery     = 'sum(container_memory_usage_bytes{pod="importpod", namespace="importnamespace"}) by (namespace, pod, container)' -replace 'importpod',$PodName -replace 'importnamespace',$Namespace
-                                        $QueryUri        = "$Url/api/v1/query?query=$MetricQuery"
+                                        switch ($MetricType) {
+                                            1 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'total-memory-all-containers-in-cluster'
+                                                $MetricDesc     = 'Query the total memory consumption of all containers in the cluster.'
+                                                $MetricQuery    = 'container_memory_usage_bytes'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            2 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'memory-specific-container'
+                                                $MetricDesc     = 'Query the memory consumption of one specific container.'
+                                                $MetricQuery    = 'container_memory_usage_bytes{container_name="importcontainername"}' -replace 'importcontainername',$ContainerName
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            3 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'average-memory-all-containers-in-app'
+                                                $MetricDesc     = 'Query the average memory consumption of all containers of the given application.'
+                                                $MetricQuery    = 'avg(container_memory_usage_bytes{namespace="importnamespace", app="importappname"})' -replace 'importnamespace',$Namespace -replace 'importappname',$AppName
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            4 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'maximum-memory-all-containers-in-cluster'
+                                                $MetricDesc     = 'Query the maximum consumption of containers in the cluster.'
+                                                $MetricQuery    = 'max(container_memory_usage_bytes)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            5 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'total-memory-all-containers-in-node'
+                                                $MetricDesc     = 'Query the total consumption of all containers on a given node.'
+                                                $MetricQuery    = 'sum(container_memory_usage_bytes) by (node)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            6 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'memory-consumed-in-1h-interval'
+                                                $MetricDesc     = 'Query the amount of memory consumed in a given time interval.'
+                                                $MetricQuery    = 'increase(container_memory_usage_bytes[1h])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            7 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'average-memory-all-containers-in-app-in-5m-interval'
+                                                $MetricDesc     = 'Query the average memory consumption of all containers of the given application in a certain time window.'
+                                                $MetricQuery    = 'avg_over_time(container_memory_usage_bytes{namespace="importnamespace", app="importappname"}[5m])' -replace 'importnamespace',$Namespace -replace 'importappname',$AppName
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            8 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'total-memory-usage-in-pod-and-namespace'
+                                                $MetricDesc     = 'Query the total memory consumption of a container in a pod in a specific namespace.'
+                                                $MetricQuery    = 'sum(container_memory_usage_bytes{pod="importpod", namespace="importnamespace"}) by (namespace, pod, container)' -replace 'importpod',$PodName -replace 'importnamespace',$Namespace
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                        }
                                     }
-                                    elseif($MetricName -eq 'PodByPhase'){
+                                    elseif($MetricName -eq 'HardDisk'){
                                         # Create metric query
-                                        $MetricCondition = $True
-                                        $MetricQuery     = 'sum by (phase)(kube_pod_status_phase)' -replace 'importpod',$PodName
-                                        $QueryUri        = "$Url/api/v1/query?query=$MetricQuery"
+                                        switch ($MetricType) {
+                                            1 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'total-size-all-disks-in-cluster'
+                                                $MetricDesc     = 'Query the total size of all disks in the cluster.'
+                                                $MetricQuery    = 'node_filesystem_size_bytes'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            2 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'available-disk-space-in-specific-node'
+                                                $MetricDesc     = 'Query available disk space on a given node.'
+                                                $MetricQuery    = 'node_filesystem_avail_bytes{mountpoint="/mnt/disk1"}'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            3 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'total-disk-usage-in-specific-node'
+                                                $MetricDesc     = 'Query the total disk usage on the given node.'
+                                                $MetricQuery    = 'node_filesystem_size_bytes{mountpoint="/mnt/disk1"} - node_filesystem_avail_bytes{mountpoint="/mnt/disk1"}'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            4 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'maximum-disk-usage-in-specific-node'
+                                                $MetricDesc     = 'Query the maximum disk usage on a given node.'
+                                                $MetricQuery    = 'avg(node_filesystem_size_bytes{job="node-exporter", cluster="importclustername"})' -replace 'importjobname',$Namespace -replace 'importclustername',$Namespace
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            5 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'amount-disk-space-in-1h-interval'
+                                                $MetricDesc     = 'Query the amount of disk space used in a given time interval.'
+                                                $MetricQuery    = 'max(node_filesystem_used_bytes{mountpoint="/mnt/disk1"})'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            6 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'amount-used-disk-space-in-1h-interval'
+                                                $MetricDesc     = 'Query for the amount of used disk space in a given time interval.'
+                                                $MetricQuery    = 'increase(node_filesystem_size_bytes{mountpoint="/mnt/disk1"}[1h])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            7 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'average-disk-size-in-group-nodes-in-5m-interval'
+                                                $MetricDesc     = 'Query the average disk size in a given group of nodes in a specific time window.'
+                                                $MetricQuery    = 'avg_over_time(node_filesystem_size_bytes{job="node-exporter", cluster="importclustername"}[5 m])' -replace 'importjobname',$Namespace -replace 'importclustername',$Namespace
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                        }
+                                    }
+                                    elseif($MetricName -eq 'Network'){
+                                        # Create metric query
+                                        switch ($MetricType) {
+                                            1 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'incoming-network-traffic-in-specific-interface'
+                                                $MetricDesc     = 'Query incoming network traffic on a given network interface.'
+                                                $MetricQuery    = 'irate(node_network_receive_bytes_total{device="eth0"}[5m])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            2 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'outgoing-network-traffic-in-specific-interface'
+                                                $MetricDesc     = 'Query outgoing network traffic on a given network interface.'
+                                                $MetricQuery    = 'irate(node_network_transmit_bytes_total{device="eth0"}[5m])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            3 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'total-network-traffic-in-5m-interval'
+                                                $MetricDesc     = 'Query the total network traffic on a given node.'
+                                                $MetricQuery    = 'irate(node_network_receive_bytes_total[5m]) + irate(node_network_transmit_bytes_total[5m])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            4 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'average-speed-network-traffic-in-5m-interval'
+                                                $MetricDesc     = 'Query the average speed of network traffic in a given time interval.'
+                                                $MetricQuery    = 'avg_over_time(node_network_receive_bytes_total[5m]) + avg_over_time(node_network_transmit_bytes_total[5m))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            5 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'number-connections-in-node'
+                                                $MetricDesc     = 'Query the number of connections on a given node.'
+                                                $MetricQuery    = 'node_netstat_Tcp_established'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            6 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'average-number-connections-in-group-node'
+                                                $MetricDesc     = 'Query the average number of connections in a given group of nodes.'
+                                                $MetricQuery    = 'avg(node_netstat_Tcp_established{job="node-exporter", cluster="importclustername"})' -replace 'importjobname',$Namespace -replace 'importclustername',$Namespace
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            7 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'number-connections-in-1h-interval'
+                                                $MetricDesc     = 'Query the number of connections in a given time interval.'
+                                                $MetricQuery    = 'increase(node_netstat_Tcp_established[1h])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                        }
+                                    }
+                                    else{
+                                        $MetricConditionList += $False
+                                    }
+                                    Write-Host $QueryUriList
+                                    # Metric methods condition
+                                    if($MetricConditionList.Count -gt 1){
+                                        if($null -eq $($MetricConditionList -match $False)){
+                                            $MetricCondition = $True
+                                        }
+                                        else{
+                                            $MetricCondition = $False
+                                        }
+                                    }
+                                    elseif($MetricConditionList.Count -eq 1){
+                                        if($MetricConditionList){
+                                            $MetricCondition = $True
+                                        }
+                                        else{
+                                            $MetricCondition = $False
+                                        }
                                     }
                                     else{
                                         $MetricCondition = $False
                                     }
-
+                                    
                                     # Metric methods condition
                                     if($MetricCondition){
-                                        # Get metrics
-                                        $RequestOutput = Invoke-RestMethod -Method GET -Uri $QueryUri -Verbose
-    
-                                        if($RequestOutput.Status -eq 'Success'){
-                                            # Convert metric data to json
-                                            $RequestJson = $RequestOutput | ConvertTo-Json -Depth 100
+                                        foreach($QueryItem in $QueryList){
+                                            # Get Query items
+                                            $QueryItemTypeName = $QueryItem.Type
+                                            $QueryItemDesc     = $QueryItem.Desc
+                                            $QueryItemUri      = $QueryItem.Uri
+                                            
+                                            Write-Host $QueryItemTypeName
+                                            Write-Host $QueryItemDesc
 
-                                            # Create Metric item file
-                                            if(Test-Path $CurrentMetricItemPath){
-                                                $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $RequestJson -Force -Verbose
+                                            # Get metrics
+                                            $RequestOutput = Invoke-RestMethod -Method GET -Uri $QueryItemUri -Verbose
+                                            $RequestOutputList += $RequestOutput
+
+                                            # Get ticks
+                                            [string]$Ticks = (Get-Date).Ticks
+
+                                            # Metric item path
+                                            $CurrentMetricItemPath = Join-Path -Path $CurrentMetricPath -ChildPath ($Ticks+'.json')
+
+                                            # Query processor 
+                                            if($RequestOutput.Status -eq 'Success'){
+                                                # Convert metric data to json
+                                                $RequestJson = $RequestOutput | ConvertTo-Json -Depth 100
+
+                                                # Create Metric item file
+                                                if(Test-Path $CurrentMetricItemPath){
+                                                    $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $RequestJson -Force -Verbose
+                                                }
+                                                else{
+                                                    $NewItem    = New-Item -ItemType File -Path $CurrentMetricItemPath -Force -Verbose
+                                                    $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $RequestJson -Force -Verbose
+                                                }
                                             }
                                             else{
-                                                $NewItem    = New-Item -ItemType File -Path $CurrentMetricItemPath -Force -Verbose
-                                                $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $RequestJson -Force -Verbose
+                                                Write-Warning ('The query could not be retrieved.')
                                             }
-                                        }
-                                        else{
-                                            Write-Warning ('The query could not be retrieved.')
                                         }
                                     }
                                     else{
-                                        Write-Warning ('The query could not be retrieved.')
+                                        Write-Warning ('Metric condition is not valid.')
                                     }
                                 }
 

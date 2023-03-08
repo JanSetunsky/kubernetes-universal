@@ -172,18 +172,58 @@
           "MD": false,
           "Data": [
             {
+              "AppName": "default",
               "Namespace": "default",
-              "PodName": "prometheus-server",
+              "ContainerName": "prometheus-server",
+              "Ports": "9091:9090",
               "Url": "127.0.0.1:9091",
+              "WindowStyle": "Normal",
               "ListOfMetric": [
                 {
-                  "Name": "Cpu"
+                  "Name": "Cpu",
+                  "Type": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7
+                  ]
                 },
                 {
-                  "Name": "Memory"
+                  "Name": "Memory",
+                  "Type": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7
+                  ]
                 },
                 {
-                  "Name": "List-Of-Error-Queries"
+                  "Name": "HardDisk",
+                  "Type": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6
+                  ]
+                },
+                {
+                  "Name": "Network",
+                  "Type": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6
+                  ]
                 }
               ]
             }
