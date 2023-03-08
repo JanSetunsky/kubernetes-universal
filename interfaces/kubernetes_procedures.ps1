@@ -3200,15 +3200,15 @@ data:
 
 
 # KUBERNETES OBSERVABILITY STACK GET METRIC DATA
-function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
+function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
 <#
 .SYNOPSIS
     Procedure definition:
-    LOCALHOST_PROCEDURE_MINIKUBE-Create_Prometheus_Server_Tunnel
+    LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics
 
 .DESCRIPTION
-    In the new session, we create a tunnel between the session and the prometheus-server.
-    With this we establish a hard connection and call metrics from prometheus.
+    In the new session, we create a tunnel between the session and the prometheus.
+    With this we establish a hard connection and call metrics from prometheus for cpu,memory,harddisk,network...
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
