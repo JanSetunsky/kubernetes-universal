@@ -3348,3 +3348,95 @@ function Invoke-Project_Procedures  {
     }
 }
 
+function New-Runspace_Procedure {
+<#
+.SYNOPSIS
+    This function allows the invoke scriptblock to run within a new runspace.
+
+.DESCRIPTION
+    Within the new runtime, encoded and decoded script blocks can be called, 
+    and the WindowStyle can also be set. The -NoExit parameter is set automatically. 
+    -Verb "runas" is set here so changes can be declared manually and not fully 
+    automatically without the user's knowledge.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER Name
+    String runspace script name declaration.
+
+.PARAMETER ScriptBlock
+    Base64String or String for runspace script block declaration.
+
+.PARAMETER CommandType
+    String runspace command type 'Encode-Command' or 'Decode-Command'.
+
+.PARAMETER WindowStyle
+    String runspace window style 'Hidden','Normal','Minimized','Maximized'.
+
+.EXAMPLE
+    Get-GitHub_Availability -OperatingSystem $OS_TYPE -Configuration $ConfigData -GitHubDatabase $GitHubData -MeasureDuration $False -ErrorAction Stop
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    PID
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$Name,
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ScriptBlock,        
+        [Parameter(Position=3,Mandatory=$True)]
+        [PSCustomObject]$CommandType,
+        [Parameter(Position=4,Mandatory=$True)]
+        [PSCustomObject]$WindowStyle        
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            [string]$GUID = [guid]::NewGuid().Guid
+            if($CommandType -eq 'Encode-Command'){
+                $Condition = $True
+                $Arguments = "-NoExit", "-WindowStyle $WindowStyle", "-encodedCommand $ScriptBlock"
+            }
+            elseif($CommandType -eq 'Decode-Command'){
+                $Condition = $True
+                $Arguments = "-NoExit", "-WindowStyle $WindowStyle", "-Command $ScriptBlock"
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $EndTime    = ''
+                $Status     = 'Running'
+                $Process    = Start-Process "pwsh.exe" -argumentlist $Arguments -PassThru -Verbose -Verb "runas"
+                $ProcessPID = $Process.Id
+            }
+            else{
+                $ProcessPID = $False
+            }
+        }
+    }
+    end{
+        Write-Host ('[ PROJECT INSTALLER - RUNSPACE PROCESS ]')
+        Write-Host ('ConditionResult:    '+$Condition)
+        Write-Host ('DurationBegin:      '+$DurationBegin)
+        Write-Host ('DurationProcess:    '+$DurationProcess)
+        Write-Host ('DurationTotal:      '+$DurationTotal)
+        Write-Host ''        
+        return $ProcessPID
+    }
+}

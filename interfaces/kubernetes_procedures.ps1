@@ -3354,15 +3354,19 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                         if($ServiceAccountCondition -match $True){
                             if($PodCondition -match $True){
                                 # Prepare kubernetes tunnel
+                                $RunspaceName        = 'prometheus-server'
+                                $RunspaceCommandType = 'Decode-Command'
+                                $RunspaceWindowStyle = 'Normal'
                                 $KubernetesNameSpace = 'default'
                                 $KubernetesPorts     = '9091:9090'
 
                                 # Create tunnel job
-                                $Job = Start-Job -ScriptBlock {
-                                    kubectl port-forward -n $KubernetesNameSpace $PodName $KubernetesPorts
-                                }
-                                $job
-                                sleep 1
+                                $TunnelScriptBlock = {
+                                    kubectl port-forward -n importnamespace importpodname importports
+                                } -replace 'importnamespace',$KubernetesNameSpace -replace 'importpodname',$PodName -replace 'importports',$KubernetesPorts
+
+                                $RunspacePid = New-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $TunnelScriptBlock -CommandType $RunspaceCommandType -WindowStyle $RunspaceWindowStyle -ErrorAction SilentlyContinue
+                                sleep 2
                                 
                                 # Prepare prometheus query
                                 $PrometheusUrl       = '127.0.0.1:9091'
@@ -3374,7 +3378,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
 
                                 if($PrometheusOutput.Status -eq 'Success'){
                                     $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
-
+                                    Write-Host $RunspacePid
                                     # Create Memory file
                                     if(Test-Path $PrometheusMetricsMemoryItemPath){
                                         $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
