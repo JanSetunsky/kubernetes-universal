@@ -3200,295 +3200,15 @@ data:
 
 
 # KUBERNETES OBSERVABILITY STACK GET METRIC DATA
-function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric {
-<#
-.SYNOPSIS
-    Procedure definition:
-    LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric
-
-.DESCRIPTION
-    Get the promeus metrics, which will save the logs in the folder with the project.
-
-.PARAMETER OperatingSystem
-    String - The operating system parameter specifies which operating system is initialized when the function
-    is run, and the function can respond with a specific command format for that operating system.
-
-.PARAMETER BuildData
-    PSCustomObject shared output from Build-Project_Environment.
-
-.PARAMETER MeasureDuration
-    Condition boolean for generating the function speed measurement result to the console as write-host.
-
-.PARAMETER ExtraData
-    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
-    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
-
-.INPUTS
-    PSCustomObject
-
-.OUTPUTS
-    Boolean
-
-.NOTES
-    Author: Jan Setunsky
-    GitHub: https://github.com/JanSetunsky
-#>
-    [CmdletBinding()]
-    param(
-        [Parameter(Position=0,Mandatory=$True)]
-        [PSCustomObject]$OperatingSystem,        
-        [Parameter(Position=1,Mandatory=$True)]
-        [PSCustomObject]$BuildData,
-        [AllowNull()]
-        [Parameter(Position=2,Mandatory=$True)]
-        [PSCustomObject]$ProcedureData,
-        [Parameter(Position=3,Mandatory=$True)]
-        [Boolean]$MeasureDuration
-    )
-    begin{
-        $DurationBegin = Measure-Command -Expression {
-            # Preparation and validation
-            if($OperatingSystem -eq 'Linux'){
-                $Condition = $True
-            }
-            elseif($OperatingSystem -eq 'MacOS'){
-                $Condition = $True
-            }
-            elseif($OperatingSystem -eq 'Windows'){
-                $Condition = $True
-
-                # MiniKube cluster availability verification
-                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
-                
-                # MiniKube deployment
-                if(
-                    $MiniKubeStatus.Type -eq 'Control Plane' -and
-                    $MiniKubeStatus.Host -eq 'Running' -and
-                    $MiniKubeStatus.KubeLet -eq 'Running' -and
-                    $MiniKubeStatus.ApiServer -eq 'Running' -and
-                    $MiniKubeStatus.Config -eq 'Configured'
-                ){
-                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath $ProjectName
-                    if(Test-Path $ProjectPath){
-                        cd $ProjectPath
-                        
-                        # Get ticks
-                        [string]$Ticks = (Get-Date).Ticks
-
-                        # Create paths
-                        $ProjectPrometheusPath           = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
-                        $ProjectPrometheusMetricsPath    = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
-                        $ProjectPrometheusMetricsCpuPath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath 'cpu'
-                        $PrometheusMetricsCpuItemPath    = Join-Path -Path $ProjectPrometheusMetricsCpuPath -ChildPath ($Ticks+'.json')
-                        $ProjectPrometheusServerUrlPath  = Join-Path -Path $ProjectPrometheusPath -ChildPath 'prometheus-server-url.txt'
-
-                        # Create prometheus directory
-                        if(Test-Path $ProjectPrometheusPath){
-                            # pass
-                        }
-                        else{
-                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusPath -Force -Verbose
-                        }
-
-                        # Create prometheus metrics directory
-                        if(Test-Path $ProjectPrometheusMetricsPath){
-                            # pass
-                        }
-                        else{
-                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsPath -Force -Verbose
-                        }
-
-                        # Create prometheus cpu directory
-                        if(Test-Path $ProjectPrometheusMetricsCpuPath){
-                            # pass
-                        }
-                        else{
-                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsCpuPath -Force -Verbose
-                        }
-                        
-                        $ServiceAccountCondition   = @()
-                        $KubeCtlGetServiceAccounts = @()
-
-                        # Get service account list
-                        $KubeCtlGetServiceAccounts += kubectl get serviceaccounts
-
-                        # Write output
-                        foreach($Output in $KubeCtlGetServiceAccounts){
-                            Write-Host $Output
-                        }
-
-                        # Find current service account
-                        foreach($ServiceAccount in $KubeCtlGetServiceAccounts){
-                            if($ServiceAccount -match 'prometheus-server'){
-                                $ServiceAccountCondition += $True
-                            }
-                            else{
-                                $ServiceAccountCondition += $False
-                            }
-                        }
-
-                        # Compare service accounts condition
-                        if($ServiceAccountCondition.Count -gt 1){
-                            if($ServiceAccountCondition -match $True){
-                                # Get prometheus-server url address process
-                                $RunspaceName              = 'prometheus-server'
-                                $RunspaceScriptBlock       = {minikube service prometheus-server --url | Out-File -Encoding utf8 -FilePath prometheus/prometheus-server-url.txt & CONTINUE}
-                                $RunspaceCommandType       = 'Decode-Command'
-                                $RunspaceProcedureMethod   = 'Test-Path'
-                                $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
-                                $RunspaceProcedureDateTime = Get-Date
-                                $RunspaceWindowStyle       = 'Normal'
-                                $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $RunspaceScriptBlock -CommandType $RunspaceCommandType -ProcedureMethod $RunspaceProcedureMethod -ProcedureInput $RunspaceProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $RunspaceWindowStyle
-
-                                if($InvokeRunspaceProcedure){
-                                    Write-Host 'Service observability stack now creates the prometheus metric log for MEMORY.'
-
-                                    # Invoke query
-                                    $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
-                                    $PrometheusQuery     = 'sum(rate(container_cpu_usage_seconds_total{container_name!="POD", container_name!="", image!="",namespace!="kube-system"}[1m])) by (namespace, pod, container)'
-                                    $PrometheusUrl       = $PrometheusServerUrl[1]
-                                    $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
-                                    $PrometheusOutput    = Invoke-RestMethod -Method Get -Uri $PrometheusUri
-                                    $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
-                                    
-                                    # Write output
-                                    foreach($Output in $PrometheusOutput){
-                                        Write-Host $Output
-                                    }
-
-                                    # Create cpu file
-                                    if(Test-Path $PrometheusMetricsCpuItemPath){
-                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
-                                    }
-                                    else{
-                                        $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsCpuItemPath -Force -Verbose
-                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
-                                    }
-                                }
-                                else{
-                                    Write-Warning 'Invoke runspace procedure is not valid.'
-                                }
-                            }
-                            else{
-                                Write-Warning 'Service deployment for prometheus-server is not exists.'
-                            }
-                        }
-                        elseif($ServiceAccountCondition.Count -eq 1){
-                            if($ServiceAccountCondition -match $True){
-                                # Get prometheus-server url address process
-                                $RunspaceName              = 'prometheus-server'
-                                $RunspaceScriptBlock       = {minikube service prometheus-server --url > prometheus-server-url.txt}
-                                $RunspaceCommandType       = 'Decode-Command'
-                                $RunspaceProcedureMethod   = 'Test-Path'
-                                $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
-                                $RunspaceProcedureDateTime = (Get-Date).AddSeconds(-10)
-                                $RunspaceWindowStyle       = 'Normal'
-                                $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $RunspaceScriptBlock -CommandType $RunspaceCommandType -ProcedureMethod $RunspaceProcedureMethod -ProcedureInput $RunspaceProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $RunspaceWindowStyle
-
-                                if($InvokeRunspaceProcedure){
-                                    Write-Host 'Service observability stack now creates the prometheus metric log for MEMORY.'
-
-                                    # Invoke query
-                                    $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
-                                    $PrometheusQuery     = 'sum(rate(container_cpu_usage_seconds_total{container_name!="POD", container_name!="", image!="",namespace!="kube-system"}[1m])) by (namespace, pod, container)'
-                                    $PrometheusUrl       = $PrometheusServerUrl[1]
-                                    $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
-                                    $PrometheusOutput    = Invoke-RestMethod -Method Get -Uri $PrometheusUri
-                                    $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
-                                    
-                                    # Write output
-                                    foreach($Output in $PrometheusOutput){
-                                        Write-Host $Output
-                                    }
-
-                                    # Create cpu file
-                                    if(Test-Path $PrometheusMetricsCpuItemPath){
-                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
-                                    }
-                                    else{
-                                        $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsCpuItemPath -Force -Verbose
-                                        $SetContent = Set-Content -Path $PrometheusMetricsCpuItemPath -Value $PrometheusJson -Force -Verbose
-                                    }
-                                }
-                                else{
-                                    Write-Warning 'Invoke runspace procedure is not valid.'
-                                }
-                            }
-                            else{
-                                Write-Warning 'Service deployment for prometheus-server is not exists.'
-                            }
-                        }
-                        else{
-                            Write-Warning 'The result for comparing service accounts is not valid.'
-                        }
-
-                    }
-                    else{
-                        Write-Warning 'Project: '+$ProjectPath+'is not exist.'
-                    }
-                }
-                elseif(
-                    $MiniKubeStatus.Type -eq 'Control Plane' -and
-                    $MiniKubeStatus.Host -eq 'Running' -and
-                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
-                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
-                    $MiniKubeStatus.Config -eq 'Configured'        
-                ){
-                    Write-Host 'MiniKube cluster is suspended.'
-                }
-                elseif(
-                    $MiniKubeStatus.Type -eq 'Control Plane' -and
-                    $MiniKubeStatus.Host -eq 'Stopped' -and
-                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
-                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
-                    $MiniKubeStatus.Config -eq 'Stopped'        
-                ){
-                    Write-Host 'MiniKube cluster is already shut down.'
-                }    
-                else{
-                    Write-Warning 'MiniKube cluster result does not match the conditions.'
-                }
-
-                Write-Host ''
-            }
-            else{
-                $Condition = $False
-            }
-        }
-    }
-    process{
-        $DurationProcess = Measure-Command -Expression {
-            if($Condition){
-                $Result = 'Success'
-            }
-            else{
-                $Result = 'Failed'
-            }
-            Write-Host ('[Result] >>>')
-            Write-Host $Result
-        }
-    }
-    end{
-        $DurationTotal = $DurationBegin+$DurationProcess
-        if($MeasureDuration){
-            $DurationTotal = $DurationBegin+$DurationProcess
-            Write-Host ('DurationBegin:      '+$DurationBegin)
-            Write-Host ('DurationProcess:    '+$DurationProcess)
-            Write-Host ('DurationTotal:      '+$DurationTotal)
-            Write-Host ''
-        }
-        return $Condition
-    }
-}
-
 function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
 <#
 .SYNOPSIS
     Procedure definition:
-    LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric
+    LOCALHOST_PROCEDURE_MINIKUBE-Create_Prometheus_Server_Tunnel
 
 .DESCRIPTION
-    Get the promeus metrics, which will save the logs in the folder with the project.
+    In the new session, we create a tunnel between the session and the prometheus-server.
+    With this we establish a hard connection and call metrics from prometheus.
 
 .PARAMETER OperatingSystem
     String - The operating system parameter specifies which operating system is initialized when the function
@@ -3557,11 +3277,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                         [string]$Ticks = (Get-Date).Ticks
 
                         # Create paths
-                        $ProjectPrometheusPath           = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
-                        $ProjectPrometheusMetricsPath    = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
+                        $ProjectPrometheusPath              = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
+                        $ProjectPrometheusMetricsPath       = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
                         $ProjectPrometheusMetricsMemoryPath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath 'Memory'
                         $PrometheusMetricsMemoryItemPath    = Join-Path -Path $ProjectPrometheusMetricsMemoryPath -ChildPath ($Ticks+'.json')
-                        $ProjectPrometheusServerUrlPath  = Join-Path -Path $ProjectPrometheusPath -ChildPath 'prometheus-server-url.txt'
 
                         # Create prometheus directory
                         if(Test-Path $ProjectPrometheusPath){
@@ -3589,6 +3308,8 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                         
                         $ServiceAccountCondition   = @()
                         $KubeCtlGetServiceAccounts = @()
+                        $PodCondition   = @()
+                        $KubeCtlGetPods = @()
 
                         # Get service account list
                         $KubeCtlGetServiceAccounts += kubectl get serviceaccounts
@@ -3608,102 +3329,51 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                             }
                         }
 
-                        # Compare service accounts condition
-                        if($ServiceAccountCondition.Count -gt 1){
-                            if($ServiceAccountCondition -match $True){
-                                $INVOKE_RUNSPACE_PROCEDURE_SC = {
-                                    # Get prometheus-server url address process
-                                    $RunspaceName              = 'prometheus-server'
-                                    $RunspaceCommandType       = 'Decode-Command'
-                                    $RunspaceProcedureMethod   = 'Test-Path'
-                                    $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
-                                    $RunspaceProcedureDateTime = Get-Date
-                                    $RunspaceWindowStyle       = 'Normal'
-                                    # Create bob for new pipeline
-                                    $RunspaceScriptBlock       = {
-                                        $Job = Start-Job -ScriptBlock { 
-                                            minikube service prometheus-server --url > prometheus/prometheus-server-url.txt
-                                        }
-                                        sleep 5
-                                        EXIT
-                                    }
-                                    $InvokeRunspaceProcedure = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $RunspaceScriptBlock -CommandType $RunspaceCommandType -ProcedureMethod $RunspaceProcedureMethod -ProcedureInput $RunspaceProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $RunspaceWindowStyle
-                                }
+                        # Get pods list
+                        $KubeCtlGetPods += kubectl get pods
 
-                                $INVOKE_PROCEDURE_SC = {
-                                    if($InvokeRunspaceProcedure){
-                                        Write-Host 'Service observability stack now creates the prometheus metric log for MEMORY.'
-                                        # Invoke query
-                                        sleep 5
-                                        $PrometheusServerUrl = Get-Content -Path $ProjectPrometheusServerUrlPath -TotalCount 2 -Force
-                                        $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
-                                        $PrometheusUrl       = $PrometheusServerUrl[1]
-                                        $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
-                                        if(Test-Connection -ComputerName $PrometheusUri -Count 1 -Quiet){
+                        # Write output
+                        foreach($Output in $KubeCtlGetPods){
+                            Write-Host $Output
+                        }
 
-                                            $PrometheusOutput    = Invoke-RestMethod -Method GET -Uri $PrometheusUri
-                                            $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
-    
-                                            # Create Memory file
-                                            if(Test-Path $PrometheusMetricsMemoryItemPath){
-                                                $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
-                                            }
-                                            else{
-                                                $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsMemoryItemPath -Force -Verbose
-                                                $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
-                                            }
-                                        }
-                                        else{
-                                            Write-Host ('Uri address is not available:'+$PrometheusUri)
-                                            $INVOKE_RUNSPACE_PROCEDURE_SC | iex -ErrorAction SilentlyContinue
-                                            $INVOKE_PROCEDURE_SC | iex -ErrorAction SilentlyContinue
-                                        }
-                                    }
-                                    else{
-                                        Write-Warning 'Invoke runspace procedure is not valid.'
-                                    }
-                                }                                
-
-                                if(Test-Path $ProjectPrometheusServerUrlPath){
-                                    $InvokeRunspaceProcedure = $True
-                                    $INVOKE_PROCEDURE_SC | iex -ErrorAction SilentlyContinue
-                                }
-                                else{
-                                    $INVOKE_RUNSPACE_PROCEDURE_SC | iex -ErrorAction SilentlyContinue
-                                    $INVOKE_PROCEDURE_SC | iex -ErrorAction SilentlyContinue
-                                }
+                        # Find current service account
+                        foreach($Pod in $KubeCtlGetPods){
+                            if($Pod -match 'prometheus-server'){
+                                $PodCondition += $True
+                                $Regex = "prometheus-server-\w+-\w+"
+                                $Match = [regex]::Match($Pod, $Regex)
+                                $PodName = $Match.Value
                             }
                             else{
-                                Write-Warning 'Service deployment for prometheus-server is not exists.'
+                                $PodCondition += $False
                             }
                         }
-                        elseif($ServiceAccountCondition.Count -eq 1){
-                            if($ServiceAccountCondition -match $True){
-                                # Get prometheus-server url address process
-                                $RunspaceName              = 'prometheus-server'
-                                $RunspaceScriptBlock       = {minikube service prometheus-server --url > prometheus-server-url.txt}
-                                $RunspaceCommandType       = 'Decode-Command'
-                                $RunspaceProcedureMethod   = 'Test-Path'
-                                $RunspaceProcedureInput    = $ProjectPrometheusServerUrlPath
-                                $RunspaceProcedureDateTime = Get-Date
-                                $RunspaceWindowStyle       = 'Normal'
-                                $InvokeRunspaceProcedure   = Invoke-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $RunspaceScriptBlock -CommandType $RunspaceCommandType -ProcedureMethod $RunspaceProcedureMethod -ProcedureInput $RunspaceProcedureInput -ProcedureDateTime $RunspaceProcedureDateTime -WindowStyle $RunspaceWindowStyle
 
-                                if($InvokeRunspaceProcedure){
-                                    Write-Host 'Service observability stack now creates the prometheus metric log for MEMORY.'
+                        # Compare service account condition and pod condition
+                        if($ServiceAccountCondition -match $True){
+                            if($PodCondition -match $True){
+                                # Prepare kubernetes tunnel
+                                $KubernetesNameSpace = 'default'
+                                $KubernetesPorts     = '9091:9090'
 
-                                    # Invoke query
-                                    $PrometheusServerUrl = gc $ProjectPrometheusServerUrlPath -Force
-                                    $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
-                                    $PrometheusUrl       = $PrometheusServerUrl[1]
-                                    $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
-                                    $PrometheusOutput    = Invoke-RestMethod -Method Get -Uri $PrometheusUri
+                                # Create tunnel job
+                                $Job = Start-Job -ScriptBlock {
+                                    kubectl port-forward -n $KubernetesNameSpace $PodName $KubernetesPorts
+                                }
+                                $job
+                                sleep 1
+                                
+                                # Prepare prometheus query
+                                $PrometheusUrl       = '127.0.0.1:9091'
+                                $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
+                                $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
+                                
+                                # Get metrics
+                                $PrometheusOutput    = Invoke-RestMethod -Method GET -Uri $PrometheusUri -Verbose
+
+                                if($PrometheusOutput.Status -eq 'Success'){
                                     $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
-                                    
-                                    # Write output
-                                    foreach($Output in $PrometheusOutput){
-                                        Write-Host $Output
-                                    }
 
                                     # Create Memory file
                                     if(Test-Path $PrometheusMetricsMemoryItemPath){
@@ -3715,15 +3385,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                                     }
                                 }
                                 else{
-                                    Write-Warning 'Invoke runspace procedure is not valid.'
+                                    Write-Warning ('The query could not be retrieved.')
                                 }
                             }
                             else{
-                                Write-Warning 'Service deployment for prometheus-server is not exists.'
+                                Write-Warning 'Pod for prometheus-server is not exists.'
                             }
                         }
                         else{
-                            Write-Warning 'The result for comparing service accounts is not valid.'
+                            Write-Warning 'Service deployment for prometheus-server is not exists.'
                         }
 
                     }
