@@ -3358,8 +3358,8 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                 $RunspaceProcessDetail = New-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $TunnelScriptBlock -CommandType $RunspaceCommandType -WindowStyle $RunspaceWindowStyle -ErrorAction SilentlyContinue
                                 
                                 if($RunspaceProcessDetail.Condition){
-                                    # Prepare prometheus query
-                                    foreach ($Metric in $ProcedureData.ListOfMetric) {
+                                    # Prepare prometheus query from List Of Metric
+                                    foreach ($Metric in $ProcedureData.ListOfMetric){
                                         # Get ticks
                                         [string]$Ticks = (Get-Date).Ticks
 
@@ -3400,7 +3400,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                             Write-Warning ('The query could not be retrieved.')
                                         }
                                     }
-                               }
+                                }
                                 else{
                                     Write-Warning 'Runspace process detail condition is false.'
                                 }
