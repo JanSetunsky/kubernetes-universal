@@ -3278,6 +3278,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                         # Create paths
                         $ProjectPrometheusPath        = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
                         $ProjectPrometheusMetricsPath = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
+                        $ProjectPrometheusPodNamePath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath $RequiredPodName
 
                         # Create prometheus directory
                         if(Test-Path $ProjectPrometheusPath){
@@ -3293,6 +3294,14 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                         }
                         else{
                             $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsPath -Force -Verbose
+                        }
+
+                        # Create prometheus pod name metrics directory
+                        if(Test-Path $ProjectPrometheusPodNamePath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusPodNamePath -Force -Verbose
                         }
                        
                         $ServiceAccountCondition   = @()
@@ -3372,7 +3381,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                                         [string]$Ticks = (Get-Date).Ticks
 
                                         # Metric path
-                                        $CurrentMetricPath     = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath $MetricName
+                                        $CurrentMetricPath     = Join-Path -Path $ProjectPrometheusPodNamePath -ChildPath $MetricName
                                         $CurrentMetricItemPath = Join-Path -Path $CurrentMetricPath -ChildPath ($Ticks+'.json')
 
                                         # Create prometheus current metric directory
