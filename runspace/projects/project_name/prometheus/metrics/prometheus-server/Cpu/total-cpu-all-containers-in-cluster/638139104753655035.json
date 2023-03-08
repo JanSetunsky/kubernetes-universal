@@ -5,6 +5,7 @@
     "result": [
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -21,12 +22,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "743.5180214013324"
+          1678310075.353,
+          "45105.8279576"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -43,12 +45,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "408.189231994354"
+          1678310075.353,
+          "26000.9935397"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -65,12 +68,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "36.9065523084944"
+          1678310075.353,
+          "2356.7875977"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -89,12 +93,13 @@
           "pod": "prometheus-prometheus-node-exporter-kfd4n"
         },
         "value": [
-          1678309107.728,
-          "1.3905694262931267"
+          1678310075.353,
+          "76.6459547"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -111,12 +116,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0213896"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -133,12 +139,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "1.4071302232497205"
+          1678310075.353,
+          "76.6247889"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -157,12 +164,13 @@
           "pod": "prometheus-server-55db4c8c5d-q5jl2"
         },
         "value": [
-          1678309107.728,
-          "15.180399095232849"
+          1678310075.353,
+          "935.6929212"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -179,12 +187,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0.0870353840265479"
+          1678310075.353,
+          "4.7066694"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -201,12 +210,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "15.100993568692834"
+          1678310075.353,
+          "930.9909686"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -223,12 +233,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0231182"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -247,12 +258,13 @@
           "pod": "storage-provisioner"
         },
         "value": [
-          1678309107.728,
-          "6.521387184846302"
+          1678310075.353,
+          "424.5723362"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -269,12 +281,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0188263"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -291,12 +304,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "6.52769824928237"
+          1678310075.353,
+          "424.5608951"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -315,12 +329,13 @@
           "pod": "kube-proxy-pjcb5"
         },
         "value": [
-          1678309107.728,
-          "1.2592702744629247"
+          1678310075.353,
+          "85.6078019"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -337,12 +352,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "1.2830417903889162"
+          1678310075.353,
+          "85.5972025"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -359,12 +375,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0096784"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -383,12 +400,13 @@
           "pod": "nginx-demo-5859956db4-jcvgk"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0896711"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -405,12 +423,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0581667"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -427,12 +446,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0315044"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -451,12 +471,13 @@
           "pod": "grafana-6bd55545d6-j68ft"
         },
         "value": [
-          1678309107.728,
-          "3.7013262267299814"
+          1678310075.353,
+          "234.8845046"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -473,12 +494,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0214775"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -495,12 +517,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "3.699545625926462"
+          1678310075.353,
+          "234.8679533"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -519,12 +542,13 @@
           "pod": "prometheus-alertmanager-0"
         },
         "value": [
-          1678309107.728,
-          "5.9876410166600165"
+          1678310075.353,
+          "393.4492696"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -541,12 +565,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0236282"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -563,12 +588,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "5.998266153822063"
+          1678310075.353,
+          "393.4114563"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -587,12 +613,13 @@
           "pod": "prometheus-kube-state-metrics-7f6769f7c6-hbpxw"
         },
         "value": [
-          1678309107.728,
-          "2.422435607485818"
+          1678310075.353,
+          "157.3707717"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -609,12 +636,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0321283"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -631,12 +659,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "2.4511311894625383"
+          1678310075.353,
+          "157.3337669"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -655,12 +684,13 @@
           "pod": "prometheus-prometheus-pushgateway-684dc6674-k578t"
         },
         "value": [
-          1678309107.728,
-          "0.7195885625632995"
+          1678310075.353,
+          "48.5028224"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -677,12 +707,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0.7196826407525924"
+          1678310075.353,
+          "48.4729702"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -699,12 +730,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0298522"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -721,12 +753,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "370.91542725320926"
+          1678310075.353,
+          "23644.883217"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -745,12 +778,13 @@
           "pod": "coredns-787d4945fb-m252k"
         },
         "value": [
-          1678309107.728,
-          "8.596308846034354"
+          1678310075.353,
+          "561.5888893"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -767,12 +801,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0217681"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -789,12 +824,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "8.600256073848714"
+          1678310075.353,
+          "561.5558975"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -813,12 +849,13 @@
           "pod": "kube-scheduler-minikube"
         },
         "value": [
-          1678309107.728,
-          "10.255420167003518"
+          1678310075.353,
+          "683.1370888"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -835,12 +872,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "10.262316214177957"
+          1678310075.353,
+          "683.0941574"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -857,12 +895,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0203441"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -881,12 +920,13 @@
           "pod": "kube-controller-manager-minikube"
         },
         "value": [
-          1678309107.728,
-          "80.42252674350866"
+          1678310075.353,
+          "5173.1141181"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -903,12 +943,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "80.44151638554622"
+          1678310075.353,
+          "5173.057075"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -925,12 +966,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0200226"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -949,12 +991,13 @@
           "pod": "kube-apiserver-minikube"
         },
         "value": [
-          1678309107.728,
-          "172.31096718355545"
+          1678310075.353,
+          "11011.6810836"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -971,12 +1014,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0210936"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -993,12 +1037,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "174.1850448573214"
+          1678310075.353,
+          "11011.6443965"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -1017,12 +1062,13 @@
           "pod": "etcd-minikube"
         },
         "value": [
-          1678309107.728,
-          "96.39267290968618"
+          1678310075.353,
+          "6214.8855935"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -1039,12 +1085,13 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "0"
+          1678310075.353,
+          "0.0193516"
         ]
       },
       {
         "metric": {
+          "__name__": "container_cpu_usage_seconds_total",
           "beta_kubernetes_io_arch": "amd64",
           "beta_kubernetes_io_os": "linux",
           "cpu": "total",
@@ -1061,8 +1108,8 @@
           "minikube_k8s_io_version": "v1.29.0"
         },
         "value": [
-          1678309107.728,
-          "96.35675660707162"
+          1678310075.353,
+          "6214.7346194"
         ]
       }
     ]

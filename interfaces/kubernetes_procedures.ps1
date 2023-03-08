@@ -3852,14 +3852,25 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                                             $RequestOutput = Invoke-RestMethod -Method GET -Uri $QueryItemUri -Verbose
                                             $RequestOutputList += $RequestOutput
 
+                                            # Metric method type path
+                                            $MetricMethodTypePath = $CurrentMetricItemPath = Join-Path -Path $CurrentMetricPath -ChildPath $QueryItemTypeName
+
+                                            # Create prometheus specific method type metric directory
+                                            if(Test-Path $MetricMethodTypePath){
+                                                # pass
+                                            }
+                                            else{
+                                                $NewItem = New-Item -ItemType Directory -Path $MetricMethodTypePath -Force -Verbose
+                                            }
+
                                             # Get ticks
-                                            $Ticks = (Get-Date).Ticks
+                                            [string]$Ticks = (Get-Date).Ticks
 
                                             # Create file name
-                                            $MetricFileName = $QueryItemTypeName+'-'+$Ticks+'.json'
+                                            $MetricFileName = $Ticks+'.json'
 
                                             # Metric item path
-                                            $CurrentMetricItemPath = Join-Path -Path $CurrentMetricPath -ChildPath $MetricFileName
+                                            $CurrentMetricItemPath = Join-Path -Path $MetricMethodTypePath -ChildPath $MetricFileName
 
                                             # Query processor 
                                             if($RequestOutput.Status -eq 'Success'){

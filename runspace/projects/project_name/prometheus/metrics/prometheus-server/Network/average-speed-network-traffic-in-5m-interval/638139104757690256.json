@@ -20,8 +20,8 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
-          "5765.264247866799"
+          1678310075.764,
+          "5825.345243971045"
         ]
       },
       {
@@ -41,7 +41,7 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
+          1678310075.764,
           "0"
         ]
       },
@@ -62,8 +62,8 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
-          "3456.125635990522"
+          1678310075.764,
+          "52.38048182843406"
         ]
       },
       {
@@ -83,8 +83,8 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
-          "60048.372793444345"
+          1678310075.764,
+          "49217.42691688443"
         ]
       },
       {
@@ -104,7 +104,7 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
+          1678310075.764,
           "0"
         ]
       },
@@ -125,7 +125,7 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
+          1678310075.764,
           "0"
         ]
       },
@@ -146,8 +146,8 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
-          "570.7514249532799"
+          1678310075.764,
+          "570.5897542389952"
         ]
       },
       {
@@ -167,8 +167,8 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
-          "4196.834798067018"
+          1678310075.764,
+          "4209.964232088114"
         ]
       },
       {
@@ -188,8 +188,8 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
-          "236.8155938688584"
+          1678310075.764,
+          "237.33614452837224"
         ]
       },
       {
@@ -209,8 +209,8 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
-          "7205.623526780166"
+          1678310075.764,
+          "7212.812621727934"
         ]
       },
       {
@@ -230,8 +230,8 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
-          "296.25236725325385"
+          1678310075.764,
+          "313.29179227505995"
         ]
       },
       {
@@ -251,7 +251,7 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
+          1678310075.764,
           "0"
         ]
       },
@@ -272,8 +272,8 @@
           "service": "prometheus-prometheus-node-exporter"
         },
         "value": [
-          1678309108.006,
-          "231.44043202026927"
+          1678310075.764,
+          "293.84417476714987"
         ]
       }
     ]
