@@ -3365,7 +3365,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
 
                                         # Metric path
                                         $CurrentMetricPath     = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath $Metric.Name
-                                        $CurrentMetricItemPath = Join-Path -Path $ProjectPrometheusMetricsMemoryPath -ChildPath ($Ticks+'.json')
+                                        $CurrentMetricItemPath = Join-Path -Path $CurrentMetricPath -ChildPath ($Ticks+'.json')
 
                                         # Create prometheus current metric directory
                                         if(Test-Path $CurrentMetricPath){
