@@ -135,21 +135,32 @@
           "Data":[]
         },
         {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics",
           "MD": false,
-          "Data":[]
-        },
-        {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_CPU_Metric",
-          "MD": false,
-          "Data":[]
+          "Data":[{
+            "PrometheusUrl": "127.0.0.1:9091",
+            "ListOfMetric": [
+              {
+                "Name" : "Memory",
+                "Query" : "sum(container_memory_usage_bytes) by (namespace, pod, container)"
+              }
+            ]
+          }]
         }
       ],
       "LOCALHOST_MINIKUBE_OBSERVABILITY_STACK_Get_Prometheus_Metrics": [
         {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics",
           "MD": false,
-          "Data":[]
+          "Data":[{
+            "PrometheusUrl": "127.0.0.1:9091",
+            "ListOfMetric": [
+              {
+                "Name" : "Memory",
+                "Query" : "sum(container_memory_usage_bytes) by (namespace, pod, container)"
+              }
+            ]
+          }]
         }
       ],
       "any_procedure_name": []

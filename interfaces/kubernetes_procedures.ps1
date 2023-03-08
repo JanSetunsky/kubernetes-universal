@@ -3200,7 +3200,7 @@ data:
 
 
 # KUBERNETES OBSERVABILITY STACK GET METRIC DATA
-function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
+function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -3273,14 +3273,9 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                     if(Test-Path $ProjectPath){
                         cd $ProjectPath
                         
-                        # Get ticks
-                        [string]$Ticks = (Get-Date).Ticks
-
                         # Create paths
                         $ProjectPrometheusPath              = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
                         $ProjectPrometheusMetricsPath       = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
-                        $ProjectPrometheusMetricsMemoryPath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath 'Memory'
-                        $PrometheusMetricsMemoryItemPath    = Join-Path -Path $ProjectPrometheusMetricsMemoryPath -ChildPath ($Ticks+'.json')
 
                         # Create prometheus directory
                         if(Test-Path $ProjectPrometheusPath){
@@ -3297,15 +3292,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                         else{
                             $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsPath -Force -Verbose
                         }
-
-                        # Create prometheus Memory directory
-                        if(Test-Path $ProjectPrometheusMetricsMemoryPath){
-                            # pass
-                        }
-                        else{
-                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsMemoryPath -Force -Verbose
-                        }
-                        
+                       
                         $ServiceAccountCondition   = @()
                         $KubeCtlGetServiceAccounts = @()
                         $PodCondition   = @()
@@ -3372,32 +3359,53 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
                                 
                                 if($RunspaceProcessDetail.Condition){
                                     # Prepare prometheus query
-                                    $PrometheusUrl       = '127.0.0.1:9091'
-                                    $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
-                                    $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
-                                    
-                                    # Get metrics
-                                    $PrometheusOutput    = Invoke-RestMethod -Method GET -Uri $PrometheusUri -Verbose
+                                    foreach ($Metric in $ProcedureData.ListOfMetric) {
+                                        # Get ticks
+                                        [string]$Ticks = (Get-Date).Ticks
 
-                                    if($PrometheusOutput.Status -eq 'Success'){
-                                        $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
-                                        Write-Host $RunspacePid
-                                        # Create Memory file
-                                        if(Test-Path $PrometheusMetricsMemoryItemPath){
-                                            $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
+                                        # Metric path
+                                        $CurrentMetricPath     = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath $Metric.Name
+                                        $CurrentMetricItemPath = Join-Path -Path $ProjectPrometheusMetricsMemoryPath -ChildPath ($Ticks+'.json')
+
+                                        # Create prometheus current metric directory
+                                        if(Test-Path $CurrentMetricPath){
+                                            # pass
                                         }
                                         else{
-                                            $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsMemoryItemPath -Force -Verbose
-                                            $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
+                                            $NewItem = New-Item -ItemType Directory -Path $CurrentMetricPath -Force -Verbose
+                                        }
+
+                                        # Create metric query
+                                        $PrometheusUrl   = $ProcedureData.PrometheusUrl
+                                        $PrometheusQuery = $Metric.Query
+                                        $PrometheusUri   = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
+                                        
+                                        # Get metrics
+                                        $PrometheusOutput = Invoke-RestMethod -Method GET -Uri $PrometheusUri -Verbose
+    
+                                        if($PrometheusOutput.Status -eq 'Success'){
+                                            $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
+                                            Write-Host $RunspacePid
+                                            # Create Memory file
+                                            if(Test-Path $PrometheusMetricsMemoryItemPath){
+                                                $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
+                                            }
+                                            else{
+                                                $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsMemoryItemPath -Force -Verbose
+                                                $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
+                                            }
+                                        }
+                                        else{
+                                            Write-Warning ('The query could not be retrieved.')
                                         }
                                     }
-                                    else{
-                                        Write-Warning ('The query could not be retrieved.')
-                                    }
-
-                                    # Kill runspace process
-                                    KILL $RunspaceProcessDetail.ProcessID
+                               }
+                                else{
+                                    Write-Warning 'Runspace process detail condition is false.'
                                 }
+
+                                # Kill runspace process
+                                KILL $RunspaceProcessDetail.ProcessID
                             }
                             else{
                                 Write-Warning 'Pod for prometheus-server is not exists.'
