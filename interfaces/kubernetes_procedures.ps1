@@ -3705,7 +3705,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                                 $MetricConditionList += $True
                                                 $MetricTypeName = 'average-disk-size-in-group-nodes-in-5m-interval'
                                                 $MetricDesc     = 'Query the average disk size in a given group of nodes in a specific time window.'
-                                                $MetricQuery    = 'avg_over_time(node_filesystem_size_bytes{job="node-exporter", cluster="importclustername"}[5 m])' -replace 'importjobname',$Namespace -replace 'importclustername',$Namespace
+                                                $MetricQuery    = 'avg_over_time(node_filesystem_size_bytes{job="node-exporter",cluster="importclustername"}[5m])' -replace 'importjobname',$Namespace -replace 'importclustername',$Namespace
                                                 $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
                                                 $QueryPSCO      = [PSCustomObject]@{
                                                     Type = $MetricTypeName
@@ -3802,6 +3802,733 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                                 $MetricTypeName = 'number-connections-in-1h-interval'
                                                 $MetricDesc     = 'Query the number of connections in a given time interval.'
                                                 $MetricQuery    = 'increase(node_netstat_Tcp_established[1h])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                        }
+                                    }
+                                    elseif($MetricName -eq 'WebServer'){
+                                        # Create metric query
+                                        switch ($MetricType) {
+                                            1 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-response-time-percentile-50'
+                                                $MetricDesc     = 'Query the 50th percentile response time of the web server in a given time interval.'
+                                                $MetricQuery    = 'histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{job="webserver",handler="/api/v1/query"}[5m])) by (le))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            2 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-response-time-percentile-90'
+                                                $MetricDesc     = 'Query the 90th percentile response time of the web server in a given time interval.'
+                                                $MetricQuery    = 'histogram_quantile(0.90, sum(rate(http_request_duration_seconds_bucket{job="webserver",handler="/api/v1/query"}[5m])) by (le))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            3 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-response-time-percentile-99'
+                                                $MetricDesc     = 'Query the 99th percentile response time of the web server in a given time interval.'
+                                                $MetricQuery    = 'histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{job="webserver",handler="/api/v1/query"}[5m])) by (le))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            4 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-response-time-average'
+                                                $MetricDesc     = 'Query the average response time of the web server in a given time interval.'
+                                                $MetricQuery    = 'avg(rate(http_request_duration_seconds_sum{job="webserver",handler="/api/v1/query"}[5m])) / avg(rate(http_request_duration_seconds_count{job="webserver",handler="/api/v1/query"}[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            5 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-response-time-max'
+                                                $MetricDesc     = 'Query the maximum response time of the web server in a given time interval.'
+                                                $MetricQuery    = 'max_over_time(http_request_duration_seconds_max{job="webserver",handler="/api/v1/query"}[5m])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            6 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-response-time-min'
+                                                $MetricDesc     = 'Query the minimum response time of the web server in a given time interval.'
+                                                $MetricQuery    = 'min_over_time(http_request_duration_seconds_min{job="webserver",handler="/api/v1/query"}[5m])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            7 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-response-time-rate'
+                                                $MetricDesc     = 'Query the rate of change of response time of the web server in a given time interval.'
+                                                $MetricQuery    = 'rate(http_request_duration_seconds_sum{job="webserver",handler="/api/v1/query"}[5m]) / rate(http_request_duration_seconds_count{job="webserver",handler="/api/v1/query"}[5m])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            8 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-response-codes'
+                                                $MetricDesc     = 'Query the count of different HTTP response codes returned by the web server.'
+                                                $MetricQuery    = 'sum(rate(http_server_requests_total{job="webserver"}[5m])) by (status_code)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            9 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-requests-rate'
+                                                $MetricDesc     = 'Query the rate of incoming requests on the web server.'
+                                                $MetricQuery    = 'irate(http_server_requests_total{job="webserver"}[5m])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            10 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-requests-per-user'
+                                                $MetricDesc     = 'Query the number of requests per user on the web server in a given time interval.'
+                                                $MetricQuery    = 'sum by (user) (rate(http_server_requests_total{job="webserver"}[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            11 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-memory-usage'
+                                                $MetricDesc     = 'Query the memory usage of the web server.'
+                                                $MetricQuery    = '100 - ((node_memory_MemFree_bytes{job="webserver"}%20%2B%20node_memory_Cached_bytes{job="webserver"}%20%2B%20node_memory_Buffers_bytes{job="webserver"}) / node_memory_MemTotal_bytes{job="webserver"} * 100)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            12 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'server-disk-usage'
+                                                $MetricDesc     = 'Query the disk usage of the web server.'
+                                                $MetricQuery    = '100 - (avg(node_filesystem_avail_bytes{job="webserver", mountpoint="/"}) / avg(node_filesystem_size_bytes{job="webserver", mountpoint="/"}) * 100)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            13 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'number-connections-in-1h-interval'
+                                                $MetricDesc     = 'Query the number of connections in a given time interval.'
+                                                $MetricQuery    = 'increase(node_netstat_Tcp_established[1h])'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                        }
+                                    }
+                                    elseif($MetricName -eq 'MQTT-Broker'){
+                                        # Create metric query
+                                        switch ($MetricType) {
+                                            1 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'mqtt-messages-count'
+                                                $MetricDesc     = 'Number of messages published to the MQTT broker'
+                                                $MetricQuery    = 'sum(rate(mqtt_messages_published_total[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            2 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'mqtt-active-clients'
+                                                $MetricDesc     = 'Number of active MQTT clients connected to the broker'
+                                                $MetricQuery    = 'count(mqtt_client_connections{state="connected"})'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            3 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'mqtt-subscriptions-count'
+                                                $MetricDesc     = 'Number of MQTT subscriptions on the broker'
+                                                $MetricQuery    = 'count(mqtt_subscriptions)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            4 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'mqtt-publish-failure'
+                                                $MetricDesc     = 'Number of failed MQTT message publishes'
+                                                $MetricQuery    = 'sum(rate(mqtt_messages_publish_errors_total[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            5 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'mqtt-sent-bytes'
+                                                $MetricDesc     = 'Number of bytes sent by the MQTT broker'
+                                                $MetricQuery    = 'sum(rate(mqtt_bytes_sent_total[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            6 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'mqtt-received-bytes'
+                                                $MetricDesc     = 'Number of bytes received by the MQTT broker'
+                                                $MetricQuery    = 'sum(rate(mqtt_bytes_received_total[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            7 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'mqtt-connection-errors'
+                                                $MetricDesc     = 'Number of errors while connecting to the MQTT broker'
+                                                $MetricQuery    = 'sum(rate(mqtt_client_connections_errors_total[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            8 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'mqtt-connection-time'
+                                                $MetricDesc     = 'Duration of connections to the MQTT broker'
+                                                $MetricQuery    = 'histogram_quantile(0.99, sum(rate(mqtt_client_connection_duration_seconds_bucket[5m])) by (le))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            9 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'mqtt-ping-time'
+                                                $MetricDesc     = 'Time taken for the MQTT broker to respond to ping requests'
+                                                $MetricQuery    = 'histogram_quantile(0.99, sum(rate(mqtt_ping_response_time_seconds_bucket[5m])) by (le))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            10 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'mqtt-latency'
+                                                $MetricDesc     = 'Latency between publishing a message and receiving it on a subscribed topic'
+                                                $MetricQuery    = 'histogram_quantile(0.99, sum(rate(mqtt_message_latency_seconds_bucket[5m])) by (le))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                        }
+                                    }
+                                    elseif($MetricName -eq 'Database'){
+                                        # Create metric query
+                                        switch ($MetricType) {
+                                            1 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'db-select-queries'
+                                                $MetricDesc     = 'Query the number of SELECT queries executed in the application.'
+                                                $MetricQuery    = 'sum(rate(database_queries_total{query_type="select"}[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            2 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'db-insert-queries'
+                                                $MetricDesc     = 'Query the number of INSERT queries executed in the application.'
+                                                $MetricQuery    = 'sum(rate(database_queries_total{query_type="insert"}[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            3 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'db-update-queries'
+                                                $MetricDesc     = 'Query the number of UPDATE queries executed in the application.'
+                                                $MetricQuery    = 'sum(rate(database_queries_total{query_type="update"}[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            4 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'db-delete-queries'
+                                                $MetricDesc     = 'Query the number of DELETE queries executed in the application.'
+                                                $MetricQuery    = 'sum(rate(database_queries_total{query_type="delete"}[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            5 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'db-transactions'
+                                                $MetricDesc     = 'Query the number of database transactions executed in the application.'
+                                                $MetricQuery    = 'sum(rate(database_transactions_total[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            6 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'db-transaction-duration'
+                                                $MetricDesc     = 'Query the average duration of database transactions in the application.'
+                                                $MetricQuery    = 'avg(database_transaction_duration_seconds)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            7 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'db-locks'
+                                                $MetricDesc     = 'Query the number of database locks acquired in the application.'
+                                                $MetricQuery    = 'sum(rate(database_locks_total[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            8 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'db-connection-pool'
+                                                $MetricDesc     = 'Query the number of connections in the database connection pool.'
+                                                $MetricQuery    = 'database_connection_pool_size'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            9 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'db-active-connections'
+                                                $MetricDesc     = 'Query the number of active database connections.'
+                                                $MetricQuery    = 'database_active_connections'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            10 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'db-idle-connections'
+                                                $MetricDesc     = 'Query the number of idle database connections.'
+                                                $MetricQuery    = 'database_idle_connections'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                        }
+                                    }
+                                    elseif($MetricName -eq 'POD'){
+                                        # Create metric query
+                                        switch ($MetricType) {
+                                            1 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-cpu-usage'
+                                                $MetricDesc     = 'Query the average CPU usage of a Kubernetes pod over a given time interval.'
+                                                $MetricQuery    = 'avg(rate(container_cpu_usage_seconds_total{namespace="default", pod=~"myapp.*"}[5m])) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            2 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-memory-usage'
+                                                $MetricDesc     = 'Query the average memory usage of a Kubernetes pod over a given time interval.'
+                                                $MetricQuery    = 'avg(container_memory_usage_bytes{namespace="default", pod=~"myapp.*"}) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            3 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-network-traffic'
+                                                $MetricDesc     = 'Query the incoming and outgoing network traffic of a Kubernetes pod over a given time interval.'
+                                                $MetricQuery    = 'sum(rate(container_network_receive_bytes_total{namespace="default", pod=~"myapp."}[5m])) by (pod), sum(rate(container_network_transmit_bytes_total{namespace="default", pod=~"myapp."}[5m])) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            4 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-network-usage'
+                                                $MetricDesc     = 'Query the network usage of a given pod in a given time interval.'
+                                                $MetricQuery    = 'sum(rate(container_network_receive_bytes_total{pod_name="my-pod"}[5m])) + sum(rate(container_network_transmit_bytes_total{pod_name="my-pod"}[5m]))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            5 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-requests-per-second'
+                                                $MetricDesc     = 'Query the number of HTTP requests served by a Kubernetes pod per second.'
+                                                $MetricQuery    = 'sum(rate(nginx_http_requests_total{namespace="default", pod=~"myapp.*"}[5m])) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            6 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-requests-latency'
+                                                $MetricDesc     = 'Query the average latency of HTTP requests served by a Kubernetes pod over a given time interval.'
+                                                $MetricQuery    = 'histogram_quantile(0.95, sum(rate(nginx_http_request_duration_seconds_bucket{namespace="default", pod=~"myapp.*"}[5m])) by (pod, le))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            7 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-errors'
+                                                $MetricDesc     = 'Query the number of errors logged by a Kubernetes pod over a given time interval.'
+                                                $MetricQuery    = 'sum(rate(container_logs{namespace="default", pod="myapp.*", message="ERROR"}[5m])) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            8 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-disk-usage'
+                                                $MetricDesc     = 'Query the disk usage of a Kubernetes pod over a given time interval.'
+                                                $MetricQuery    = 'avg(container_fs_usage_bytes{namespace="default", pod=~"myapp.*"}) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            9 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-startup-time'
+                                                $MetricDesc     = 'Query the time taken by a Kubernetes pod to start up.'
+                                                $MetricQuery    = 'kube_pod_start_time{namespace="default", pod=~"myapp."} - on (namespace, pod) group_left() kube_pod_spec_start_time{namespace="default", pod=~"myapp."}'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            10 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-restarts'
+                                                $MetricDesc     = 'Query the number of times a Kubernetes pod has restarted over a given time interval.'
+                                                $MetricQuery    = 'sum(rate(kube_pod_container_status_restarts_total{namespace="default", pod=~"myapp.*"}[5m])) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            11 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'pod-oom-kills'
+                                                $MetricDesc     = 'Query the number of times a Kubernetes pod has been killed due to out-of-memory errors over a given time interval.'
+                                                $MetricQuery    = 'sum(kube_pod_container_status_last_terminated_reason{reason="OOMKilled", namespace="default", pod=~"myapp.*"}) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                        }
+                                    }
+                                    elseif($MetricName -eq 'Service'){
+                                        # Create metric query
+                                        switch ($MetricType) {
+                                            1 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'service-response-time'
+                                                $MetricDesc     = 'Query the average response time of a Kubernetes service over a given time interval.'
+                                                $MetricQuery    = 'avg(rate(http_request_duration_seconds_sum{namespace="default", kubernetes_name="my-service"}[5m])) by (kubernetes_name)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            2 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'service-throughput'
+                                                $MetricDesc     = 'Query the rate of requests per second to a Kubernetes service over a given time interval.'
+                                                $MetricQuery    = 'sum(rate(http_requests_total{namespace="default", kubernetes_name="my-service"}[5m])) by (kubernetes_name)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            3 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'service-latency'
+                                                $MetricDesc     = 'Query the latency of requests to a Kubernetes service over a given time interval.'
+                                                $MetricQuery    = 'histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{namespace="default", kubernetes_name="my-service"}[5m])) by (kubernetes_name, le))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            4 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'service-error-rate'
+                                                $MetricDesc     = 'Query the error rate of requests to a Kubernetes service over a given time interval.'
+                                                $MetricQuery    = 'sum(rate(http_requests_total{namespace="default", kubernetes_name="my-service", status_code=~"5.."}[5m])) by (kubernetes_name)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            5 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'service-availability'
+                                                $MetricDesc     = 'Query the availability of a Kubernetes service over a given time interval.'
+                                                $MetricQuery    = '100 - (sum(rate(http_requests_total{namespace="default", kubernetes_name="my-service", status_code=~"5.."}[5m])) by (kubernetes_name) / sum(rate(http_requests_total{namespace="default", kubernetes_name="my-service"}[5m])) by (kubernetes_name) * 100)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            6 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'service-memory-usage'
+                                                $MetricDesc     = 'Query the average memory usage of a Kubernetes service over a given time interval.'
+                                                $MetricQuery    = 'avg(container_memory_usage_bytes{namespace="default", pod=~"my-service.*"}) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            7 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'service-cpu-usage'
+                                                $MetricDesc     = 'Query the average CPU usage of a Kubernetes service over a given time interval.'
+                                                $MetricQuery    = 'avg(rate(container_cpu_usage_seconds_total{namespace="default", pod=~"my-service.*"}[5m])) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            8 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'service-incoming-traffic'
+                                                $MetricDesc     = 'Query the rate of incoming network traffic to a Kubernetes service over a given time interval.'
+                                                $MetricQuery    = 'sum(rate(container_network_receive_bytes_total{namespace="default", pod=~"my-service.*"}[5m])) by (pod)'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            9 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'service-latency'
+                                                $MetricDesc     = 'Query the latency of a Kubernetes service over a given time interval.'
+                                                $MetricQuery    = 'histogram_quantile(0.5, sum(rate(http_request_duration_seconds_bucket{namespace="default", kubernetes_name="my-service"}[5m])) by (le, kubernetes_name))'
+                                                $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
+                                                $QueryPSCO      = [PSCustomObject]@{
+                                                    Type = $MetricTypeName
+                                                    Desc = $MetricDesc
+                                                    Uri  = $QueryUri
+                                                }
+                                                $QueryList += $QueryPSCO
+                                            }
+                                            10 {
+                                                $MetricConditionList += $True
+                                                $MetricTypeName = 'service-request-rate'
+                                                $MetricDesc     = 'Query the rate of requests to a Kubernetes service over a given time interval.'
+                                                $MetricQuery    = 'sum(rate(http_requests_total{namespace="default", kubernetes_name="my-service"}[5m])) by (kubernetes_name)'
                                                 $QueryUri       = "$Url/api/v1/query?query=$MetricQuery"
                                                 $QueryPSCO      = [PSCustomObject]@{
                                                     Type = $MetricTypeName

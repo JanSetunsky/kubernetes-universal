@@ -147,7 +147,7 @@
       ],
       "LOCALHOST_MINIKUBE_OBSERVABILITY_STACK_Get_Prometheus_Metrics": [
         {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics",
           "MD": false,
           "Data":[{
             "AppName": "default",
@@ -159,19 +159,23 @@
             "ListOfMetric": [
               {
                 "Name" : "Cpu",
-                "Type" : [1,2,3,4,5,6,7]
+                "Type" : [1,2,3,4,5,6,7,8]
               },
               {
                 "Name" : "Memory",
-                "Type" : [1,2,3,4,5,6,7]
+                "Type" : [1,2,3,4,5,6,7,8]
               },
               {
                 "Name" : "HardDisk",
-                "Type" : [1,2,3,4,5,6]
+                "Type" : [1,2,3,4,5,6,7]
               },
               {
                 "Name" : "Network",
-                "Type" : [1,2,3,4,5,6]
+                "Type" : [1,2,3,4,5,6,7]
+              },
+              {
+                "Name" : "WebServer",
+                "Type" : [1,2,3,4,5,6,7,8,9,10,11,12,13]
               }
             ]
           }]
