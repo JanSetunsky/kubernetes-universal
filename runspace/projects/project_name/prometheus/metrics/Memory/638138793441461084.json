@@ -1,0 +1,145 @@
+{
+  "status": "success",
+  "data": {
+    "resultType": "vector",
+    "result": [
+      {
+        "metric": {},
+        "value": [
+          1678278946.7,
+          "6758416384"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "prometheus-prometheus-node-exporter-kfd4n"
+        },
+        "value": [
+          1678278946.7,
+          "23982080"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "prometheus-server-55db4c8c5d-q5jl2"
+        },
+        "value": [
+          1678278946.7,
+          "518451200"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "storage-provisioner"
+        },
+        "value": [
+          1678278946.7,
+          "21946368"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "kube-proxy-pjcb5"
+        },
+        "value": [
+          1678278946.7,
+          "22712320"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "grafana-6bd55545d6-j68ft"
+        },
+        "value": [
+          1678278946.7,
+          "56791040"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "prometheus-alertmanager-0"
+        },
+        "value": [
+          1678278946.7,
+          "25997312"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "prometheus-kube-state-metrics-7f6769f7c6-hbpxw"
+        },
+        "value": [
+          1678278946.7,
+          "23367680"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "default",
+          "pod": "prometheus-prometheus-pushgateway-684dc6674-k578t"
+        },
+        "value": [
+          1678278946.7,
+          "23629824"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "coredns-787d4945fb-m252k"
+        },
+        "value": [
+          1678278946.7,
+          "31019008"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "kube-scheduler-minikube"
+        },
+        "value": [
+          1678278946.7,
+          "31137792"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "kube-controller-manager-minikube"
+        },
+        "value": [
+          1678278946.7,
+          "57585664"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "kube-apiserver-minikube"
+        },
+        "value": [
+          1678278946.7,
+          "294969344"
+        ]
+      },
+      {
+        "metric": {
+          "namespace": "kube-system",
+          "pod": "etcd-minikube"
+        },
+        "value": [
+          1678278946.7,
+          "194985984"
+        ]
+      }
+    ]
+  }
+}

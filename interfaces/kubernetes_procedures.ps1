@@ -3362,34 +3362,41 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metric {
 
                                 # Create tunnel job
                                 $TunnelScriptBlock = {
-                                    kubectl port-forward -n importnamespace importpodname importports
+                                    $Job = Start-Job -ScriptBlock {
+                                        kubectl port-forward -n importnamespace importpodname importports
+                                    }
                                 } -replace 'importnamespace',$KubernetesNameSpace -replace 'importpodname',$PodName -replace 'importports',$KubernetesPorts
 
-                                $RunspacePid = New-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $TunnelScriptBlock -CommandType $RunspaceCommandType -WindowStyle $RunspaceWindowStyle -ErrorAction SilentlyContinue
+                                $RunspaceProcessDetail = New-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $TunnelScriptBlock -CommandType $RunspaceCommandType -WindowStyle $RunspaceWindowStyle -ErrorAction SilentlyContinue
                                 sleep 2
                                 
-                                # Prepare prometheus query
-                                $PrometheusUrl       = '127.0.0.1:9091'
-                                $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
-                                $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
-                                
-                                # Get metrics
-                                $PrometheusOutput    = Invoke-RestMethod -Method GET -Uri $PrometheusUri -Verbose
+                                if($RunspaceProcessDetail.Condition){
+                                    # Prepare prometheus query
+                                    $PrometheusUrl       = '127.0.0.1:9091'
+                                    $PrometheusQuery     = 'sum(container_memory_usage_bytes) by (namespace, pod, container)'
+                                    $PrometheusUri       = "$PrometheusUrl/api/v1/query?query=$PrometheusQuery"
+                                    
+                                    # Get metrics
+                                    $PrometheusOutput    = Invoke-RestMethod -Method GET -Uri $PrometheusUri -Verbose
 
-                                if($PrometheusOutput.Status -eq 'Success'){
-                                    $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
-                                    Write-Host $RunspacePid
-                                    # Create Memory file
-                                    if(Test-Path $PrometheusMetricsMemoryItemPath){
-                                        $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
+                                    if($PrometheusOutput.Status -eq 'Success'){
+                                        $PrometheusJson      = $PrometheusOutput | ConvertTo-Json -Depth 100
+                                        Write-Host $RunspacePid
+                                        # Create Memory file
+                                        if(Test-Path $PrometheusMetricsMemoryItemPath){
+                                            $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
+                                        }
+                                        else{
+                                            $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsMemoryItemPath -Force -Verbose
+                                            $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
+                                        }
                                     }
                                     else{
-                                        $NewItem    = New-Item -ItemType File -Path $PrometheusMetricsMemoryItemPath -Force -Verbose
-                                        $SetContent = Set-Content -Path $PrometheusMetricsMemoryItemPath -Value $PrometheusJson -Force -Verbose
+                                        Write-Warning ('The query could not be retrieved.')
                                     }
-                                }
-                                else{
-                                    Write-Warning ('The query could not be retrieved.')
+                                    
+                                    # Kill runspace process
+                                    KILL $RunspaceProcessDetail.ProcessID
                                 }
                             }
                             else{

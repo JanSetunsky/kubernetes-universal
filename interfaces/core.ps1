@@ -3382,7 +3382,7 @@ function New-Runspace_Procedure {
     PSCustomObject
 
 .OUTPUTS
-    PID
+    PSCustomObject
 
 .NOTES
     Author: Jan Setunsky
@@ -3424,9 +3424,45 @@ function New-Runspace_Procedure {
                 $Status     = 'Running'
                 $Process    = Start-Process "pwsh.exe" -argumentlist $Arguments -PassThru -Verbose -Verb "runas"
                 $ProcessPID = $Process.Id
+                $RunspaceId = $GUID
+                $RunspaceProcess = {
+                    $Items = Get-CimInstance -ClassName win32_process -filter "ProcessId = `'$ProcessPID`'" 
+                    if($Items.Count -ge 1){
+                        foreach ($Item in $Items) {
+                            #get owner
+                            $Owner = Invoke-CimMethod -InputObject $Item -MethodName GetOwner
+                            $Parent = Get-Process -Id $Item.ParentprocessID
+                            $RunspaceProcessDetail = [PSCustomObject]@{
+                                Condition       = $True
+                                PSTypename      = "PowerShellProcess"
+                                ProcessID       = $Item.ProcessID
+                                Name            = $Item.Name
+                                ScriptName      = $Name
+                                Status          = $Status
+                                Handles         = $Item.HandleCount
+                                WorkingSet      = $Item.WorkingSetSize
+                                ParentProcessID = $Item.ParentProcessID
+                                ParentProcess   = $Parent.Name
+                                ParentPath      = $Parent.Path
+                                Started         = $Item.CreationDate
+                                Ended           = $EndTime
+                                Owner           = "$($Owner.Domain)\$($Owner.user)"
+                                CommandLine     = $Item.Commandline
+                            }
+                        }
+                    }
+                    else{
+                        $RunspaceProcessDetail = [PSCustomObject]@{
+                            Condition = $False
+                        }
+                    }
+                }
+                $RunspaceProcess | iex -ErrorAction SilentlyContinue
             }
             else{
-                $ProcessPID = $False
+                $RunspaceProcessDetail = [PSCustomObject]@{
+                    Condition = $False
+                }
             }
         }
     }
@@ -3437,6 +3473,6 @@ function New-Runspace_Procedure {
         Write-Host ('DurationProcess:    '+$DurationProcess)
         Write-Host ('DurationTotal:      '+$DurationTotal)
         Write-Host ''        
-        return $ProcessPID
+        return $RunspaceProcessDetail
     }
 }
