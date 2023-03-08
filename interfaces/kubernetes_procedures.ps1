@@ -3273,12 +3273,18 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                     if(Test-Path $ProjectPath){
                         cd $ProjectPath
                         
-                        $RequiredPodName = 'prometheus-server'
+                        # Procedure variables
+                        $CommandType = 'Decode-Command'
+                        $Namespace   = $ProcedureData.Namespace
+                        $PodName     = $ProcedureData.PodName
+                        $Ports       = $ProcedureData.Ports
+                        $Url         = $ProcedureData.Url
+                        $WindowStyle = $ProcedureData.WindowStyle
 
                         # Create paths
                         $ProjectPrometheusPath        = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
                         $ProjectPrometheusMetricsPath = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
-                        $ProjectPrometheusPodNamePath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath $RequiredPodName
+                        $ProjectPrometheusPodNamePath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath $PodName
 
                         # Create prometheus directory
                         if(Test-Path $ProjectPrometheusPath){
@@ -3319,7 +3325,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
 
                         # Find current service account
                         foreach($ServiceAccount in $KubeCtlGetServiceAccounts){
-                            if($ServiceAccount -match $RequiredPodName){
+                            if($ServiceAccount -match $PodName){
                                 $ServiceAccountCondition += $True
                             }
                             else{
@@ -3337,9 +3343,9 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
 
                         # Find current service account
                         foreach($Pod in $KubeCtlGetPods){
-                            if($Pod -match $RequiredPodName){
+                            if($Pod -match $PodName){
                                 $PodCondition += $True
-                                $Regex = ($RequiredPodName+"-\w+-\w+")
+                                $Regex = ($PodName+"-\w+-\w+")
                                 $Match = [regex]::Match($Pod, $Regex)
                                 $PodName = $Match.Value
                             }
@@ -3351,102 +3357,107 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics {
                         # Compare service account condition and pod condition
                         if($ServiceAccountCondition -match $True){
                             if($PodCondition -match $True){
-                                # Prepare kubernetes tunnel
-                                $RunspaceName        = $PodName
-                                $RunspaceCommandType = 'Decode-Command'
-                                $RunspaceWindowStyle = 'Normal'
-                                $KubernetesNameSpace = 'default'
-                                $KubernetesPorts     = '9091:9090'
+                                # Runspace firt start
+                                $RunspaceFirstStart = $True
 
-                                # Create tunnel job
-                                $TunnelScriptBlock = {
-                                    $Job = Start-Job -ScriptBlock {
-                                        kubectl port-forward -n importnamespace importpodname importports
+                                # Prepare prometheus query from List Of Metric
+                                foreach ($Metric in $ProcedureData.ListOfMetric){
+                                    # Metric variables
+                                    $MetricName      = $Metric.Name
+
+                                    if($RunspaceProcessDetail.Condition){
+                                        # pass
                                     }
-                                } -replace 'importnamespace',$KubernetesNameSpace -replace 'importpodname',$PodName -replace 'importports',$KubernetesPorts
+                                    elseif($RunspaceFirstStart){
+                                        # Create tunnel job
+                                        $ScriptBlock = {
+                                            $Job = Start-Job -ScriptBlock {
+                                                kubectl port-forward -n importnamespace importpodname importports
+                                            }
+                                        } -replace 'importnamespace',$Namespace -replace 'importpodname',$PodName -replace 'importports',$Ports
 
-                                # Start new runspace
-                                $RunspaceProcessDetail = New-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $RunspaceName -ScriptBlock $TunnelScriptBlock -CommandType $RunspaceCommandType -WindowStyle $RunspaceWindowStyle -ErrorAction SilentlyContinue
-                                
-                                if($RunspaceProcessDetail.Condition){
-                                    # Prepare prometheus query from List Of Metric
-                                    foreach ($Metric in $ProcedureData.ListOfMetric){
-                                        # Procedure variables
-                                        $PrometheusUrl = $ProcedureData.PrometheusUrl
+                                        # Start new runspace
+                                        $RunspaceProcessDetail = New-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $PodName -ScriptBlock $ScriptBlock -CommandType $CommandType -WindowStyle $WindowStyle -ErrorAction SilentlyContinue
+                                        $RunspaceFirstStart    = $False
+                                    }
+                                    else{
+                                        Write-Warning 'Runspace process detail condition is false.'
+                                    }
+                                    
+                                    # Get ticks
+                                    [string]$Ticks = (Get-Date).Ticks
 
-                                        # Metric variables
-                                        $MetricName = $Metric.Name
+                                    # Metric path
+                                    $CurrentMetricPath     = Join-Path -Path $ProjectPrometheusPodNamePath -ChildPath $MetricName
+                                    $CurrentMetricItemPath = Join-Path -Path $CurrentMetricPath -ChildPath ($Ticks+'.json')
 
-                                        # Get ticks
-                                        [string]$Ticks = (Get-Date).Ticks
+                                    # Create prometheus current metric directory
+                                    if(Test-Path $CurrentMetricPath){
+                                        # pass
+                                    }
+                                    else{
+                                        $NewItem = New-Item -ItemType Directory -Path $CurrentMetricPath -Force -Verbose
+                                    }
 
-                                        # Metric path
-                                        $CurrentMetricPath     = Join-Path -Path $ProjectPrometheusPodNamePath -ChildPath $MetricName
-                                        $CurrentMetricItemPath = Join-Path -Path $CurrentMetricPath -ChildPath ($Ticks+'.json')
+                                    # Metric methods by name
+                                    if($MetricName -eq 'Cpu'){
+                                        # Create metric query
+                                        $MetricCondition = $True
+                                        $MetricQuery     = 'sum(container_cpu_usage_seconds_total{pod="importpod", namespace="importnamespace"}) by (namespace, pod, container)' -replace 'importpod',$PodName -replace 'importnamespace',$Namespace
+                                        $QueryUri        = "$Url/api/v1/query?query=$MetricQuery"
+                                    }
+                                    elseif($MetricName -eq 'Memory'){
+                                        # Create metric query
+                                        $MetricCondition = $True
+                                        $MetricQuery     = 'sum(container_memory_usage_bytes{pod="importpod", namespace="importnamespace"}) by (namespace, pod, container)' -replace 'importpod',$PodName -replace 'importnamespace',$Namespace
+                                        $QueryUri        = "$Url/api/v1/query?query=$MetricQuery"
+                                    }
+                                    elseif($MetricName -eq 'PodByPhase'){
+                                        # Create metric query
+                                        $MetricCondition = $True
+                                        $MetricQuery     = 'sum by (phase)(kube_pod_status_phase)' -replace 'importpod',$PodName
+                                        $QueryUri        = "$Url/api/v1/query?query=$MetricQuery"
+                                    }
+                                    else{
+                                        $MetricCondition = $False
+                                    }
 
-                                        # Create prometheus current metric directory
-                                        if(Test-Path $CurrentMetricPath){
-                                            # pass
-                                        }
-                                        else{
-                                            $NewItem = New-Item -ItemType Directory -Path $CurrentMetricPath -Force -Verbose
-                                        }
+                                    # Metric methods condition
+                                    if($MetricCondition){
+                                        # Get metrics
+                                        $RequestOutput = Invoke-RestMethod -Method GET -Uri $QueryUri -Verbose
+    
+                                        if($RequestOutput.Status -eq 'Success'){
+                                            # Convert metric data to json
+                                            $RequestJson = $RequestOutput | ConvertTo-Json -Depth 100
 
-                                        if($MetricName -eq 'Cpu'){
-                                            # Create metric query
-                                            $MetricCondition = $True
-                                            $MetricQuery     = 'sum(container_cpu_usage_seconds_total{pod="importpod"}) by (namespace, pod, container)' -replace 'importpod',$PodName
-                                            $PrometheusUri   = "$PrometheusUrl/api/v1/query?query=$MetricQuery"
-                                        }
-                                        elseif($MetricName -eq 'Memory'){
-                                            # Create metric query
-                                            $MetricCondition = $True
-                                            $MetricQuery     = 'sum(container_memory_usage_bytes{pod="importpod"}) by (namespace, pod, container)' -replace 'importpod',$PodName
-                                            $PrometheusUri   = "$PrometheusUrl/api/v1/query?query=$MetricQuery"
-                                        }
-                                        else{
-                                            $MetricCondition = $False
-                                        }
-
-                                        if($MetricCondition){
-                                            # Get metrics
-                                            $PrometheusOutput = Invoke-RestMethod -Method GET -Uri $PrometheusUri -Verbose
-        
-                                            if($PrometheusOutput.Status -eq 'Success'){
-                                                # Convert metric data to json
-                                                $PrometheusJson = $PrometheusOutput | ConvertTo-Json -Depth 100
-
-                                                # Create Metric item file
-                                                if(Test-Path $CurrentMetricItemPath){
-                                                    $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $PrometheusJson -Force -Verbose
-                                                }
-                                                else{
-                                                    $NewItem    = New-Item -ItemType File -Path $CurrentMetricItemPath -Force -Verbose
-                                                    $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $PrometheusJson -Force -Verbose
-                                                }
+                                            # Create Metric item file
+                                            if(Test-Path $CurrentMetricItemPath){
+                                                $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $RequestJson -Force -Verbose
                                             }
                                             else{
-                                                Write-Warning ('The query could not be retrieved.')
+                                                $NewItem    = New-Item -ItemType File -Path $CurrentMetricItemPath -Force -Verbose
+                                                $SetContent = Set-Content -Path $CurrentMetricItemPath -Value $RequestJson -Force -Verbose
                                             }
                                         }
                                         else{
                                             Write-Warning ('The query could not be retrieved.')
                                         }
                                     }
-                                }
-                                else{
-                                    Write-Warning 'Runspace process detail condition is false.'
+                                    else{
+                                        Write-Warning ('The query could not be retrieved.')
+                                    }
                                 }
 
                                 # Kill runspace process
                                 KILL $RunspaceProcessDetail.ProcessID
                             }
                             else{
-                                Write-Warning 'Pod for prometheus-server is not exists.'
+                                Write-Warning 'Pod for '+$PodName+' is not exists.'
                             }
                         }
                         else{
-                            Write-Warning 'Service deployment for prometheus-server is not exists.'
+                            Write-Warning 'Service deployment for '+$PodName+' is not exists.'
                         }
 
                     }

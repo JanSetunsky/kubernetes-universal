@@ -150,10 +150,15 @@
           "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Server_Metrics",
           "MD": false,
           "Data":[{
-            "PrometheusUrl": "127.0.0.1:9091",
+            "Namespace": "default",
+            "PodName": "prometheus-server",
+            "Ports": "9091:9090",
+            "Url": "127.0.0.1:9091",
+            "WindowStyle": "Normal",
             "ListOfMetric": [
               {"Name" : "Cpu"},
-              {"Name" : "Memory"}
+              {"Name" : "Memory"},
+              {"Name": "List-Of-Error-Queries"}
             ]
           }]
         }

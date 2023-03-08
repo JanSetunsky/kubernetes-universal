@@ -172,13 +172,18 @@
           "MD": false,
           "Data": [
             {
-              "PrometheusUrl": "127.0.0.1:9091",
+              "Namespace": "default",
+              "PodName": "prometheus-server",
+              "Url": "127.0.0.1:9091",
               "ListOfMetric": [
                 {
                   "Name": "Cpu"
                 },
                 {
                   "Name": "Memory"
+                },
+                {
+                  "Name": "List-Of-Error-Queries"
                 }
               ]
             }
