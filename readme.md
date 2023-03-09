@@ -6,9 +6,7 @@ All automation processes can be automated from A to Z using procedures.
 
 ## The lifecycle of an application build
 
-### Plugins
-
-#### Jenkins
+### Plugins Jenkins
 
 Jenkins offers many plugins that can be connected to extend the functionality of the platform. Plugins allow users to customize Jenkins to their needs and integrate it with other tools and services.
 
