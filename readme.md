@@ -32,11 +32,11 @@ Packages represent application names and their installation scheme. If you fill 
 
 ### Installation
 
-There are two installation options, which can be found in the setup folder. There is either `.setup/install_environment.ps1` or `.setup/fullautomation.ps1`.
+There are two installation options, which can be found in the setup folder. There is either `.setup/install_environment.ps1` or `.setup/automatic_full_installation.ps1`.
 
 If we choose `.setup/install_environment.ps1`, the basic dependencies will be installed and then it is possible to manually test the functions found in all `.libraries/kubernetes/*`. You just need to invoke these functions with the `pwsh 'file path' method, for example.
 
-If we choose `.setup/ifullautomation.ps1`, all dependencies will be installed, prometheus and grafana will be deployed, and the nginx web server will be deployed.
+If we choose `.setup/automatic_full_installation.ps1`, all dependencies will be installed, prometheus and grafana will be deployed, and the nginx web server will be deployed.
 
 Part of the installation is the creation of the runspace folder, where the projects folder is created automatically and where your project is created under the name ProjectName, which is part of the configuration file.
 
