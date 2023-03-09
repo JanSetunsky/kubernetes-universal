@@ -1034,7 +1034,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
 
 
 # KUBERNETES NGINX WEB SERVER
-function LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Nginx_Image {
+function LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Image {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1206,7 +1206,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Nginx_Image {
     }
 }
 
-function LOCALHOST_PROCEDURE_MINIKUBE-Update_Nginx_Image {
+function LOCALHOST_PROCEDURE_MINIKUBE-Update_Image {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1374,7 +1374,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Update_Nginx_Image {
     }
 }
 
-function LOCALHOST_PROCEDURE_MINIKUBE-Delete_Nginx_Image {
+function LOCALHOST_PROCEDURE_MINIKUBE-Delete_Image {
 <#
 .SYNOPSIS
     Procedure definition:
@@ -1541,7 +1541,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Delete_Nginx_Image {
     }
 }
 
-function LOCALHOST_PROCEDURE_MINIKUBE-Get_Nginx_Service {
+function LOCALHOST_PROCEDURE_MINIKUBE-Get_Service {
 <#
 .SYNOPSIS
     Procedure definition:

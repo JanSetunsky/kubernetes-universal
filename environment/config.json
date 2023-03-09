@@ -41,9 +41,9 @@
           "Data":[]
         }
       ],
-      "LOCALHOST_MINIKUBE_DEPLOY_IMAGE": [
+      "LOCALHOST_MINIKUBE_DEPLOY_NGINX_IMAGE": [
         {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Nginx_Image",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Image",
           "MD": false,
           "Data":[{
             "DeploymentName": "nginx-demo",
@@ -53,16 +53,16 @@
           }]
         },
         {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Nginx_Service",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Service",
           "MD": false,
           "Data":[{
             "DeploymentName": "nginx-demo"
           }]
         }
       ],
-      "LOCALHOST_MINIKUBE_UPDATE_IMAGE": [
+      "LOCALHOST_MINIKUBE_UPDATE_NGINX_IMAGE": [
         {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Update_Nginx_Image",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Update_Image",
           "MD": false,
           "Data":[{
             "DeploymentName": "nginx-demo",
@@ -70,19 +70,64 @@
           }]
         },
         {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Nginx_Service",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Service",
           "MD": false,
           "Data":[{
             "DeploymentName": "nginx-demo"
           }]
         }
       ],
-      "LOCALHOST_MINIKUBE_DELETE_IMAGE": [
+      "LOCALHOST_MINIKUBE_DELETE_NGINX_IMAGE": [
         {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Delete_Nginx_Image",
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Delete_Image",
           "MD": false,
           "Data":[{
             "DeploymentName": "nginx-demo"
+          }]
+        }
+      ],
+      "LOCALHOST_MINIKUBE_DEPLOY_JENKINS_IMAGE": [
+        {
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Image",
+          "MD": false,
+          "Data":[{
+            "DeploymentName": "jenkins",
+            "DeploymentImage": "jenkins/jenkins:lts",
+            "DeploymentType": "LoadBalancer",
+            "DeploymentPort": "8080"
+          }]
+        },
+        {
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Service",
+          "MD": false,
+          "Data":[{
+            "DeploymentName": "jenkins"
+          }]
+        }
+      ],
+      "LOCALHOST_MINIKUBE_UPDATE_JENKINS_IMAGE": [
+        {
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Update_Image",
+          "MD": false,
+          "Data":[{
+            "DeploymentName": "jenkins",
+            "DeploymentImage": "jenkins/jenkins:lts"
+          }]
+        },
+        {
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Service",
+          "MD": false,
+          "Data":[{
+            "DeploymentName": "jenkins"
+          }]
+        }
+      ],
+      "LOCALHOST_MINIKUBE_DELETE_JENKINS_IMAGE": [
+        {
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Delete_Image",
+          "MD": false,
+          "Data":[{
+            "DeploymentName": "jenkins"
           }]
         }
       ],
