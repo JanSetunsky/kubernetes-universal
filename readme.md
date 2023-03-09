@@ -109,3 +109,10 @@ The `.environment/config.json` file contains a section called ListOfProcedures w
 
 These procedures trigger specific functions where we can create specific routine processes for a given automation of DevOps development activities.
 
+### Prometheus Metrics
+
+Prometheus metrics are used to monitor application or system performance. These metrics are usually obtained from various sources such as logs, timers, events, etc. and are stored in the Promethea database.
+The metrics are further processed and visualized in various tools, such as grafana.
+
+As an example, I have listed about 100 types of metrics that can be found in the `.interfaces/kubernetes_procedures.ps1` file in the function: LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics , but they need to be set and their setting depends on the application and/or project requirements.
+
