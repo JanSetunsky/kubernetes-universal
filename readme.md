@@ -6,6 +6,36 @@ All automation processes can be automated from A to Z using procedures.
 
 ## The lifecycle of an application build
 
+### Plugins
+
+#### Jenkins
+
+Jenkins offers many plugins that can be connected to extend the functionality of the platform. Plugins allow users to customize Jenkins to their needs and integrate it with other tools and services.
+
+##### Pipeline
+Plugin for pipeline as code support, allows users to define and develop a pipeline as part of a configuration file in the repository.
+
+##### Git
+Git: a plugin for integration with Git repositories, allowing users to create Jenkins jobs that run processes whenever a change is made to a Git repository.
+
+##### Docker
+Docker: Docker integration plugin, allows users to create and run Docker containers as part of Jenkins jobs.
+
+##### Slack
+Slack Notification: plugin allows users to send notifications to Slack as part of Jenkins jobs.
+
+##### GitHub
+GitHub: a plugin to integrate with GitHub, allows users to create Jenkins jobs that run processes whenever a change is made to a GitHub repository.
+
+##### Email
+Email Extension: a plugin for extending email notification functionality in Jenkins, allowing users to customize the format and content of email messages.
+
+##### LDAP
+LDAP: LDAP integration plugin, allows users to log into Jenkins using existing LDAP accounts.
+
+##### Ansible
+Ansible: Ansible integration plugin, allows users to run Ansible playbooks as part of Jenkins jobs.
+
 ### Environment configuration file
 
 First of all, we need to fill in a configuration file that represents the local or shared 
