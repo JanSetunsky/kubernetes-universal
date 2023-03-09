@@ -4776,3 +4776,174 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
     }
 }
 
+
+
+# KUBERNETES JENKINS
+function LOCALHOST_PROCEDURE_MINIKUBE-Install_Jenkins_Plugins {
+<#
+.SYNOPSIS
+    Procedure definition:
+    LOCALHOST_PROCEDURE_MINIKUBE-Install_Jenkins_Plugins
+
+.DESCRIPTION
+    This function installs and deploys specific plugins to jenkins.
+    External data from the configuration file is used for deployment.
+
+.PARAMETER OperatingSystem
+    String - The operating system parameter specifies which operating system is initialized when the function
+    is run, and the function can respond with a specific command format for that operating system.
+
+.PARAMETER BuildData
+    PSCustomObject shared output from Build-Project_Environment.
+
+.PARAMETER MeasureDuration
+    Condition boolean for generating the function speed measurement result to the console as write-host.
+
+.PARAMETER ExtraData
+    PSCustomObject - The extra data parameter specifies whether extra data is available for the implementation, 
+    otherwise it is null. This parameter is only used for specific functions for better automation using a configuration file.
+
+.INPUTS
+    PSCustomObject
+
+.OUTPUTS
+    PSCustomObject
+
+.NOTES
+    Author: Jan Setunsky
+    GitHub: https://github.com/JanSetunsky
+#>
+    [CmdletBinding()]
+    param(
+        [Parameter(Position=0,Mandatory=$True)]
+        [PSCustomObject]$OperatingSystem,        
+        [Parameter(Position=1,Mandatory=$True)]
+        [PSCustomObject]$BuildData,
+        [AllowNull()]
+        [Parameter(Position=2,Mandatory=$True)]
+        [PSCustomObject]$ProcedureData,
+        [Parameter(Position=3,Mandatory=$True)]
+        [Boolean]$MeasureDuration
+    )
+    begin{
+        $DurationBegin = Measure-Command -Expression {
+            # Preparation and validation
+            if($OperatingSystem -eq 'Linux'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'MacOS'){
+                $Condition = $True
+            }
+            elseif($OperatingSystem -eq 'Windows'){
+                $Condition = $True
+
+                # MiniKube cluster availability verification
+                $MiniKubeStatus = LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status -OperatingSystem $OperatingSystem -BuildData $BuildData -ProcedureData $ProcedureData -MeasureDuration $MeasureDuration -ErrorAction SilentlyContinue
+            
+                # MiniKube deployment
+                if(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Running' -and
+                    $MiniKubeStatus.ApiServer -eq 'Running' -and
+                    $MiniKubeStatus.Config -eq 'Configured'
+                ){
+                    $ProjectPath = Join-Path -Path $ProjectsPath -ChildPath  $ProjectName
+                    if(Test-Path $ProjectPath){
+                        # Navigate to project repository 
+                        cd $ProjectPath
+
+                        # Procedure data
+                        $DeploymentName  = $ProcedureData.DeploymentName
+
+                        # Get deployments
+                        $KubeCtlDeployments = kubectl get deployments $DeploymentName
+
+                        # Validation of deployment condition
+                        if($KubeCtlDeployments.Count -ge 1){
+                            $DeploymentCondition = 'is-ready'
+                        }
+                        else{
+                            $DeploymentCondition = 'is-not-ready'
+                        }
+
+                        # Validation of deployment
+                        if($DeploymentCondition -eq 'is-ready'){
+                            Write-Warning ('MiniKube cluster already contains deployments named: '+$DeploymentName)
+                        }
+                        elseif($DeploymentCondition -eq 'is-not-ready'){
+                            # Create deployment
+                            $KubeCtlCreate = kubectl create deployment $DeploymentName --image=$DeploymentImage
+                            $KubeCtlExpose = kubectl expose deployment $DeploymentName --type=$DeploymentType --port=$DeploymentPort
+
+                            # Write output
+                            foreach($Output in $KubeCtlCreate){
+                                Write-Host $Output
+                            }
+
+                            # Write output
+                            foreach($Output in $KubeCtlExpose){
+                                Write-Host $Output
+                            }                            
+                        }
+                        else{
+                            Write-Warning 'MiniKube cluster triggered an invalid condition'
+                        }
+                    }
+                    else{
+                        Write-Warning 'Project: '+$ProjectPath+'is not exist.'
+                    }
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Running' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Paused' -and
+                    $MiniKubeStatus.Config -eq 'Configured'        
+                ){
+                    Write-Host 'MiniKube cluster is suspended.'
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Stopped' -and
+                    $MiniKubeStatus.KubeLet -eq 'Stopped' -and
+                    $MiniKubeStatus.ApiServer -eq 'Stopped' -and
+                    $MiniKubeStatus.Config -eq 'Stopped'        
+                ){
+                    Write-Host 'MiniKube cluster is already shut down.'
+                }    
+                else{
+                    Write-Warning 'MiniKube cluster result does not match the conditions.'
+                }
+
+                Write-Host ''
+            }
+            else{
+                $Condition = $False
+            }
+        }
+    }
+    process{
+        $DurationProcess = Measure-Command -Expression {
+            if($Condition){
+                $Result = 'Success'
+            }
+            else{
+                $Result = 'Failed'
+            }
+            Write-Host ('[Result] >>>')
+            Write-Host $Result
+        }
+    }
+    end{
+        $DurationTotal = $DurationBegin+$DurationProcess
+        if($MeasureDuration){
+            $DurationTotal = $DurationBegin+$DurationProcess
+            Write-Host ('DurationBegin:      '+$DurationBegin)
+            Write-Host ('DurationProcess:    '+$DurationProcess)
+            Write-Host ('DurationTotal:      '+$DurationTotal)
+            Write-Host ''
+        }
+        return $Condition
+    }
+}

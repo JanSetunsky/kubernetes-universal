@@ -131,6 +131,15 @@
           }]
         }
       ],
+      "LOCALHOST_MINIKUBE_INSTALL_JENKINS_PLUGINS": [
+        {
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Install_Jenkins_Plugins",
+          "MD": false,
+          "Data":[{
+            "DeploymentName": "jenkins"
+          }]
+        }
+      ],
       "LOCALHOST_MINIKUBE_OBSERVABILITY_STACK_Helm_Install_Prometheus_Grafana": [
         {
           "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Prometheus",
