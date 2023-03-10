@@ -150,6 +150,28 @@
           ]
         }
       ],
+      "LOCALHOST_MINIKUBE_INSTALL_JENKINS_PLUGINS": [
+        {
+          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Install_Jenkins_Plugins",
+          "MD": false,
+          "Data": [
+            {
+              "AppName": "default",
+              "Namespace": "default",
+              "DeploymentName": "jenkins",
+              "ContainerName": "jenkins",
+              "Ports": "8080:8080",
+              "Url": "127.0.0.1:8080",
+              "WindowStyle": "Normal",
+              "ListOfPlugin": [
+                {
+                  "Name": "Pipeline"
+                }
+              ]
+            }
+          ]
+        }
+      ],
       "LOCALHOST_MINIKUBE_OBSERVABILITY_STACK_Helm_Install_Prometheus_Grafana": [
         {
           "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Prometheus",
@@ -205,20 +227,6 @@
           "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Create_Prometheus_Server_Configuration",
           "MD": false,
           "Data": []
-        },
-        {
-          "Name": "LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Memory_Metrics",
-          "MD": false,
-          "Data": [
-            {
-              "PrometheusUrl": "127.0.0.1:9091",
-              "ListOfMetric": [
-                {
-                  "Name": "Memory"
-                }
-              ]
-            }
-          ]
         }
       ],
       "LOCALHOST_MINIKUBE_OBSERVABILITY_STACK_Get_Prometheus_Metrics": [

@@ -102,7 +102,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Start_Local_Cluster {
                     foreach($Output in $MiniKubeStart){
                         Write-Host $Output
                     }
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -228,6 +237,15 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Stop_Local_Cluster {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
                 }    
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
@@ -358,7 +376,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Pause_Local_Cluster {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -488,7 +515,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-UnPause_Local_Cluster {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -623,7 +659,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Delete_Local_Cluster {
                     Write-Host 'MiniKube cluster is already shut down.'
                     Write-Host 'MiniKube cluster will be deleted.'
                     $MiniKubeDelete = minikube delete
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -758,7 +803,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Delete_All_Clusters {
                     Write-Host 'MiniKube cluster is already shut down.'
                     Write-Host 'MiniKube all clusters will be deleted.'
                     $MiniKubeDelete = minikube delete --all
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -891,6 +945,9 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
                     elseif($MiniKubeHost -match 'Running'){
                         $MiniKubeHost = 'Running'
                     }
+                    elseif($MiniKubeHost -match 'Nonexistent'){
+                        $MiniKubeHost = 'Nonexistent'
+                    }
                     else{
                         $MiniKubeHost = 'Uknown'
                     }
@@ -900,7 +957,10 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
                     }
                     elseif($MiniKubeKubeLet -match 'Running'){
                         $MiniKubeKubeLet = 'Running'
-                    }    
+                    }
+                    elseif($MiniKubeKubeLet -match 'Nonexistent'){
+                        $MiniKubeKubeLet = 'Nonexistent'
+                    }
                     else{
                         $MiniKubeKubeLet = 'Uknown'
                     }
@@ -911,8 +971,11 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
                     elseif($MiniKubeApiServer -match 'Running'){
                         $MiniKubeApiServer = 'Running'
                     }
-                    elseif($MiniKubeApiServer -match 'Running'){
+                    elseif($MiniKubeApiServer -match 'Paused'){
                         $MiniKubeApiServer = 'Paused'
+                    }
+                    elseif($MiniKubeApiServer -match 'Nonexistent'){
+                        $MiniKubeApiServer = 'Nonexistent'
                     }
                     else{
                         $MiniKubeApiServer = 'Uknown'
@@ -923,6 +986,9 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
                     }
                     elseif($MiniKubeKubeConfig -match 'Configured'){
                         $MiniKubeKubeConfig = 'Configured'
+                    }
+                    elseif($MiniKubeKubeConfig -match 'Nonexistent'){
+                        $MiniKubeKubeConfig = 'Nonexistent'
                     }
                     else{
                         $MiniKubeKubeConfig = 'Uknown'
@@ -982,7 +1048,25 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Local_Cluster_Status {
                             Config     = $MiniKubeKubeConfig
                             IsRunning  = $False
                         }
-                    }    
+                    }
+                    elseif(
+                        $MiniKubeStatus.Type -eq 'Control Plane' -and
+                        $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                        $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                        $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                        $MiniKubeStatus.Config -eq 'Nonexistent'        
+                    ){
+                        Write-Host 'MiniKube cluster is not exist.'
+                        # Create Output
+                        $MiniKubeOutput = [PSCustomObject]@{
+                            Type       = $MiniKubeType
+                            Host       = $MiniKubeHost
+                            KubeLet    = $MiniKubeKubeLet
+                            ApiServer  = $MiniKubeApiServer
+                            Config     = $MiniKubeKubeConfig
+                            IsRunning  = $False
+                        }
+                    }
                     else{
                         Write-Warning 'MiniKube cluster result does not match the conditions.'
                         # Create Output
@@ -1169,7 +1253,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Deploy_Image {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -1337,7 +1430,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Update_Image {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -1504,7 +1606,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Delete_Image {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -1665,7 +1776,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Service {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -1836,7 +1956,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Prometheus {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -2004,7 +2133,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Helm_Install_Grafana {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -2170,7 +2308,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Kubernetes_Dashboard {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -2336,7 +2483,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Monitoring_Standalone {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -2516,7 +2672,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Create_Service_Account_Prometheus {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -2782,7 +2947,16 @@ roleRef:
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -3160,7 +3334,16 @@ data:
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -3273,7 +3456,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                     if(Test-Path $ProjectPath){
                         cd $ProjectPath
                         
-                        # Procedure variables
+                        # Procedure data
                         $CommandType   = 'Decode-Command'
                         $AppName       = $ProcedureData.AppName
                         $Namespace     = $ProcedureData.Namespace
@@ -3354,7 +3537,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                                 $PodCondition += $False
                             }
                         }
-                        Write-Host $PodName
+
                         # Compare service account condition and pod condition
                         if($ServiceAccountCondition -match $True){
                             if($PodCondition -match $True){
@@ -4739,7 +4922,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Get_Prometheus_Metrics {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
@@ -4807,7 +4999,7 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Install_Jenkins_Plugins {
     PSCustomObject
 
 .OUTPUTS
-    PSCustomObject
+    Boolean
 
 .NOTES
     Author: Jan Setunsky
@@ -4854,7 +5046,42 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Install_Jenkins_Plugins {
                         cd $ProjectPath
 
                         # Procedure data
-                        $DeploymentName  = $ProcedureData.DeploymentName
+                        $CommandType    = 'Decode-Command'
+                        $Namespace      = $ProcedureData.Namespace
+                        $DeploymentName = $ProcedureData.DeploymentName
+                        $ContainerName  = $ProcedureData.ContainerName
+                        $Ports          = $ProcedureData.Ports
+                        $Url            = $ProcedureData.Url
+                        $WindowStyle    = $ProcedureData.WindowStyle
+
+                        # Create paths
+                        $ProjectPrometheusPath              = Join-Path -Path $ProjectPath -ChildPath 'prometheus'
+                        $ProjectPrometheusMetricsPath       = Join-Path -Path $ProjectPrometheusPath -ChildPath 'metrics'
+                        $ProjectPrometheusContainerNamePath = Join-Path -Path $ProjectPrometheusMetricsPath -ChildPath $ContainerName
+
+                        # Create prometheus directory
+                        if(Test-Path $ProjectPrometheusPath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusPath -Force -Verbose
+                        }
+
+                        # Create prometheus metrics directory
+                        if(Test-Path $ProjectPrometheusMetricsPath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusMetricsPath -Force -Verbose
+                        }
+
+                        # Create prometheus pod name metrics directory
+                        if(Test-Path $ProjectPrometheusContainerNamePath){
+                            # pass
+                        }
+                        else{
+                            $NewItem = New-Item -ItemType Directory -Path $ProjectPrometheusContainerNamePath -Force -Verbose
+                        }
 
                         # Get deployments
                         $KubeCtlDeployments = kubectl get deployments $DeploymentName
@@ -4869,22 +5096,121 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Install_Jenkins_Plugins {
 
                         # Validation of deployment
                         if($DeploymentCondition -eq 'is-ready'){
-                            Write-Warning ('MiniKube cluster already contains deployments named: '+$DeploymentName)
-                        }
-                        elseif($DeploymentCondition -eq 'is-not-ready'){
-                            # Create deployment
-                            $KubeCtlCreate = kubectl create deployment $DeploymentName --image=$DeploymentImage
-                            $KubeCtlExpose = kubectl expose deployment $DeploymentName --type=$DeploymentType --port=$DeploymentPort
 
+                            $ServiceCondition  = @()
+                            $KubeCtlGetService = @()
+                            $PodCondition   = @()
+                            $KubeCtlGetPods = @()
+    
+                            # Get service list
+                            $KubeCtlGetService += kubectl get service $ContainerName
+    
                             # Write output
-                            foreach($Output in $KubeCtlCreate){
+                            foreach($Output in $KubeCtlGetService){
                                 Write-Host $Output
                             }
-
+    
+                            # Find current service
+                            foreach($ServiceAccount in $KubeCtlGetService){
+                                if($ServiceAccount -match $PodName){
+                                    $ServiceCondition += $True
+                                }
+                                else{
+                                    $ServiceCondition += $False
+                                }
+                            }
+    
+                            # Get pods list
+                            $KubeCtlGetPods += kubectl get pods
+    
                             # Write output
-                            foreach($Output in $KubeCtlExpose){
+                            foreach($Output in $KubeCtlGetPods){
                                 Write-Host $Output
-                            }                            
+                            }
+    
+                            # Find current service account
+                            foreach($Pod in $KubeCtlGetPods){
+                                if($Pod -match $ContainerName){
+                                    $PodCondition += $True
+                                    $Regex = ($ContainerName+"-\w+-\w+")
+                                    $Match = [regex]::Match($Pod, $Regex)
+                                    $PodName = $Match.Value
+                                }
+                                else{
+                                    $PodCondition += $False
+                                }
+                            }
+
+                            # Compare service account condition and pod condition
+                            if($ServiceCondition -match $True){
+                                if($PodCondition -match $True){
+                                    # Get Jenkins password
+                                    $JenkinsLog             = kubectl logs $PodName -c jenkins
+                                    $JenkinsToken           = ([regex]::Match($JenkinsLog, '\b([a-fA-F0-9]{32})\b')).Value
+                                    $SecurePassword         = ConvertTo-SecureString -AsPlainText $JenkinsToken -Force
+                                    $JenkinsCredential      = New-Object System.Management.Automation.PSCredential("admin",$SecurePassword)
+                                    # $JenkinsCrumbHeader     = Invoke-WebRequest -Method Get -Uri $JenkinsEscapedCrumbUrl -Credential $JenkinsCredential
+
+                                    # Runspace firt start
+                                    $RunspaceFirstStart = $True
+
+                                    # Prepare prometheus query from List Of Metric
+                                    foreach ($Plugin in $ProcedureData.ListOfPlugin){
+                                        # Metric variables
+                                        $PluginName = $Plugin.Name
+
+                                        if($RunspaceProcessDetail.Condition){
+                                            # pass
+                                        }
+                                        elseif($RunspaceFirstStart){
+                                            # Create tunnel job
+                                            $ScriptBlock = {
+                                                $Job = Start-Job -ScriptBlock {
+                                                    kubectl port-forward -n importnamespace importpodname importports
+                                                }
+                                            } -replace 'importnamespace',$Namespace -replace 'importpodname',$PodName -replace 'importports',$Ports
+
+                                            # Start new runspace
+                                            $RunspaceProcessDetail = New-Runspace_Procedure -OperatingSystem $OperatingSystem -Name $PodName -ScriptBlock $ScriptBlock -CommandType $CommandType -WindowStyle $WindowStyle -ErrorAction SilentlyContinue
+                                            $RunspaceFirstStart    = $False
+                                        }
+                                        else{
+                                            Write-Warning 'Runspace process detail condition is false.'
+                                        }
+
+                                        # Installation process
+                                        $JenkinsCrumbUrl        = $Url+"/crumbIssuer/api/xml"
+                                        $JenkinsCrumb           = Invoke-WebRequest -Method Get -Uri $JenkinsCrumbUrl -Credential $JenkinsCredential -Authentication Basic -AllowUnencryptedAuthentication:$true | Select-Object -ExpandProperty Content
+                                        $JenkinsCrumbSplit      = $JenkinsCrumb.Split(':')
+                                        Write-Host $JenkinsCrumb
+                                        Write-Host $JenkinsCrumbSplit
+                                        $JenkinsEscapedCrumb    = $JenkinsCrumbSplit[1].Trim()
+                                        Write-Host 'aaaaaaaaa'
+                                        $JenkinsEscapedCrumbUrl = "$($JenkinsCrumbSplit[0].Trim())://$JenkinsEscapedCrumb"
+
+                                        $PluginXmlUri           = ('http://'+$Url+"/pluginManager/installNecessaryPlugins?plugin."+$PluginName)
+                                        $PluginXmlRequest       = Invoke-WebRequest -Method Post -Uri $PluginXmlUri -Credential $JenkinsCredential -Authentication Basic -AllowUnencryptedAuthentication:$true -Headers @{ "Jenkins-Crumb" = "$JenkinsEscapedCrumbUrl" }
+                                        $PluginHash             = [xml]$PluginXmlRequest.Content | Select-Object -ExpandProperty hash
+                                        $PluginUri              = 'http://'+$Url+"/pluginManager/installPlugins"
+                                        $PluginInstallRequest   = Invoke-WebRequest -Method Post -Uri $PluginUri -Credential $JenkinsCredential -Authentication Basic -AllowUnencryptedAuthentication:$true -Body @{ "dynamicLoad" = "true"; ("plugin."+$PluginName+".hpi") = $PluginHash }
+                                        
+                                        # Write output
+                                        foreach($Output in $PluginInstallRequest){
+                                            Write-Host $Output
+                                        }
+
+                                    }
+                                }
+                                else{
+                                    Write-Warning 'Pod for '+$PodName+' is not exists.'
+                                }
+                            }
+                            else{
+                                Write-Warning 'Service deployment for '+$PodName+' is not exists.'
+                            }
+                        }
+                        elseif($DeploymentCondition -eq 'is-not-ready'){
+                            Write-Warning ('MiniKube cluster does not contain a named deployment: '+$DeploymentName)
                         }
                         else{
                             Write-Warning 'MiniKube cluster triggered an invalid condition'
@@ -4911,7 +5237,16 @@ function LOCALHOST_PROCEDURE_MINIKUBE-Install_Jenkins_Plugins {
                     $MiniKubeStatus.Config -eq 'Stopped'        
                 ){
                     Write-Host 'MiniKube cluster is already shut down.'
-                }    
+                }
+                elseif(
+                    $MiniKubeStatus.Type -eq 'Control Plane' -and
+                    $MiniKubeStatus.Host -eq 'Nonexistent' -and
+                    $MiniKubeStatus.KubeLet -eq 'Nonexistent' -and
+                    $MiniKubeStatus.ApiServer -eq 'Nonexistent' -and
+                    $MiniKubeStatus.Config -eq 'Nonexistent'        
+                ){
+                    Write-Host 'MiniKube cluster is not exist.'
+                }
                 else{
                     Write-Warning 'MiniKube cluster result does not match the conditions.'
                 }
